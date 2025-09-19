@@ -667,119 +667,329 @@ const SupplyChainDashboard = () => {
         <div className="bg-white rounded-lg shadow-sm border">
           {selectedTab === "overview" && (
             <div className="p-6">
-              <h3 className="text-lg font-semibold mb-4">
-                LangGraph Multi-Agent System
+              <h3 className="text-lg font-semibold mb-6">
+                LangGraph Multi-Agent System - Real-Time Flow
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-3">
-                    Agent Workflow
-                  </h4>
-                  <div className="space-y-3">
-                    <div className="flex items-center p-3 bg-blue-50 rounded-lg">
-                      <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
-                        1
+              
+              {/* Real-time Visual Graph */}
+              <div className="mb-8">
+                <div className="relative bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-8 min-h-[600px] border-2 border-blue-100">
+                  <svg width="100%" height="500" className="overflow-visible">
+                    {/* Background Grid */}
+                    <defs>
+                      <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+                        <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" strokeWidth="0.5" opacity="0.3"/>
+                      </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#grid)" />
+                    
+                    {/* Connection Lines (Edges) */}
+                    {/* Data Ingestion to Disruption Detection */}
+                    <path
+                      d="M 120 80 Q 200 80 280 120"
+                      stroke="#3b82f6"
+                      strokeWidth="3"
+                      fill="none"
+                      className={`${dataIngestionMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
+                      markerEnd="url(#arrowhead)"
+                    />
+                    
+                    {/* Disruption Detection to Risk Scoring */}
+                    <path
+                      d="M 350 160 Q 430 200 500 240"
+                      stroke="#10b981"
+                      strokeWidth="3"
+                      fill="none"
+                      className={`${disruptionDetectionMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
+                      markerEnd="url(#arrowhead)"
+                    />
+                    
+                    {/* Risk Scoring to Notification */}
+                    <path
+                      d="M 570 280 Q 650 320 720 360"
+                      stroke="#f59e0b"
+                      strokeWidth="3"
+                      fill="none"
+                      className={`${riskScoringMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
+                      markerEnd="url(#arrowhead)"
+                    />
+                    
+                    {/* Risk Scoring to Mitigation */}
+                    <path
+                      d="M 570 280 Q 650 240 720 200"
+                      stroke="#8b5cf6"
+                      strokeWidth="3"
+                      fill="none"
+                      className={`${mitigationMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
+                      markerEnd="url(#arrowhead)"
+                    />
+                    
+                    {/* Arrow markers */}
+                    <defs>
+                      <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#6b7280" />
+                      </marker>
+                    </defs>
+                    
+                    {/* Agent Nodes */}
+                    {/* Data Ingestion Agent */}
+                    <g transform="translate(50, 50)">
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="40" 
+                        fill="#dbeafe" 
+                        stroke="#3b82f6" 
+                        strokeWidth="3"
+                        className={`${dataIngestionMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
+                      />
+                      <Database className="h-8 w-8 text-blue-600" x="42" y="42" />
+                      <text x="50" y="110" textAnchor="middle" className="text-sm font-semibold fill-gray-800">
+                        Data Ingestion
+                      </text>
+                      <text x="50" y="125" textAnchor="middle" className="text-xs fill-gray-600">
+                        {dataIngestionMetrics.quality.freshness.toFixed(1)}% Fresh
+                      </text>
+                    </g>
+                    
+                    {/* Disruption Detection Agent */}
+                    <g transform="translate(280, 90)">
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="40" 
+                        fill="#dcfce7" 
+                        stroke="#10b981" 
+                        strokeWidth="3"
+                        className={`${disruptionDetectionMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
+                      />
+                      <Shield className="h-8 w-8 text-green-600" x="42" y="42" />
+                      <text x="50" y="110" textAnchor="middle" className="text-sm font-semibold fill-gray-800">
+                        Disruption Detection
+                      </text>
+                      <text x="50" y="125" textAnchor="middle" className="text-xs fill-gray-600">
+                        {disruptionDetectionMetrics.anomalyDetection.zScoreAnalysis.alertsGenerated} Alerts
+                      </text>
+                    </g>
+                    
+                    {/* Risk Scoring Agent */}
+                    <g transform="translate(500, 210)">
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="40" 
+                        fill="#fef3c7" 
+                        stroke="#f59e0b" 
+                        strokeWidth="3"
+                        className={`${riskScoringMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
+                      />
+                      <Target className="h-8 w-8 text-yellow-600" x="42" y="42" />
+                      <text x="50" y="110" textAnchor="middle" className="text-sm font-semibold fill-gray-800">
+                        Risk Scoring
+                      </text>
+                      <text x="50" y="125" textAnchor="middle" className="text-xs fill-gray-600">
+                        Score: {riskScoringMetrics.multiFactorAnalysis.overallScore.toFixed(1)}
+                      </text>
+                    </g>
+                    
+                    {/* Notification Agent */}
+                    <g transform="translate(720, 330)">
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="40" 
+                        fill="#e0e7ff" 
+                        stroke="#6366f1" 
+                        strokeWidth="3"
+                        className={`${notificationMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
+                      />
+                      <Bell className="h-8 w-8 text-indigo-600" x="42" y="42" />
+                      <text x="50" y="110" textAnchor="middle" className="text-sm font-semibold fill-gray-800">
+                        Notification
+                      </text>
+                      <text x="50" y="125" textAnchor="middle" className="text-xs fill-gray-600">
+                        {notificationMetrics.channelSelection.phone.sent + notificationMetrics.channelSelection.email.sent} Sent
+                      </text>
+                    </g>
+                    
+                    {/* Mitigation Recommendation Agent */}
+                    <g transform="translate(720, 170)">
+                      <circle 
+                        cx="50" 
+                        cy="50" 
+                        r="40" 
+                        fill="#f3e8ff" 
+                        stroke="#8b5cf6" 
+                        strokeWidth="3"
+                        className={`${mitigationMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
+                      />
+                      <Brain className="h-8 w-8 text-purple-600" x="42" y="42" />
+                      <text x="50" y="110" textAnchor="middle" className="text-sm font-semibold fill-gray-800">
+                        Mitigation
+                      </text>
+                      <text x="50" y="125" textAnchor="middle" className="text-xs fill-gray-600">
+                        {mitigationMetrics.feasibilityScoring.recommendationsGenerated} Recommendations
+                      </text>
+                    </g>
+                    
+                    {/* Data Flow Indicators */}
+                    {dataIngestionMetrics.activity.length > 0 && (
+                      <circle cx="200" cy="80" r="4" fill="#3b82f6" className="animate-ping">
+                        <animate attributeName="r" values="2;8;2" dur="2s" repeatCount="indefinite"/>
+                      </circle>
+                    )}
+                    
+                    {disruptionDetectionMetrics.activity.length > 0 && (
+                      <circle cx="430" cy="200" r="4" fill="#10b981" className="animate-ping">
+                        <animate attributeName="r" values="2;8;2" dur="2s" repeatCount="indefinite"/>
+                      </circle>
+                    )}
+                    
+                    {riskScoringMetrics.activity.length > 0 && (
+                      <circle cx="650" cy="320" r="4" fill="#f59e0b" className="animate-ping">
+                        <animate attributeName="r" values="2;8;2" dur="2s" repeatCount="indefinite"/>
+                      </circle>
+                    )}
+                    
+                    {mitigationMetrics.activity.length > 0 && (
+                      <circle cx="650" cy="240" r="4" fill="#8b5cf6" className="animate-ping">
+                        <animate attributeName="r" values="2;8;2" dur="2s" repeatCount="indefinite"/>
+                      </circle>
+                    )}
+                  </svg>
+                  
+                  {/* Real-time Status Legend */}
+                  <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-lg">
+                    <h4 className="font-semibold text-sm mb-3 text-gray-800">Real-time Status</h4>
+                    <div className="space-y-2">
+                      <div className="flex items-center text-xs">
+                        <div className="w-3 h-3 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
+                        <span>Data Flow Active</span>
                       </div>
-                      <div>
-                        <div className="font-medium">Data Ingestion Agent</div>
-                        <div className="text-sm text-gray-600">
-                          LangChain + Supabase integration
-                        </div>
+                      <div className="flex items-center text-xs">
+                        <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                        <span>Agent Processing</span>
                       </div>
-                      <CheckCircle className="h-5 w-5 text-green-500 ml-auto" />
-                    </div>
-
-                    <div className="flex items-center p-3 bg-green-50 rounded-lg">
-                      <div className="w-8 h-8 bg-green-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
-                        2
+                      <div className="flex items-center text-xs">
+                        <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
+                        <span>Risk Analysis</span>
                       </div>
-                      <div>
-                        <div className="font-medium">
-                          Disruption Detection Agent
-                        </div>
-                        <div className="text-sm text-gray-600">
-                          AI-powered anomaly detection
-                        </div>
+                      <div className="flex items-center text-xs">
+                        <div className="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
+                        <span>Recommendations</span>
                       </div>
-                      <CheckCircle className="h-5 w-5 text-green-500 ml-auto" />
-                    </div>
-
-                    <div className="flex items-center p-3 bg-yellow-50 rounded-lg">
-                      <div className="w-8 h-8 bg-yellow-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
-                        3
-                      </div>
-                      <div>
-                        <div className="font-medium">Risk Scoring Agent</div>
-                        <div className="text-sm text-gray-600">
-                          RAG-enhanced risk assessment
-                        </div>
-                      </div>
-                      <CheckCircle className="h-5 w-5 text-green-500 ml-auto" />
-                    </div>
-
-                    <div className="flex items-center p-3 bg-purple-50 rounded-lg">
-                      <div className="w-8 h-8 bg-purple-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
-                        4
-                      </div>
-                      <div>
-                        <div className="font-medium">Notification Agent</div>
-                        <div className="text-sm text-gray-600">
-                          Personalized communication
-                        </div>
-                      </div>
-                      <CheckCircle className="h-5 w-5 text-green-500 ml-auto" />
                     </div>
                   </div>
                 </div>
-
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-3">
-                    System Architecture
+              </div>
+              
+              {/* Real-time Activity Feed */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* System Overview */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
+                    <Activity className="h-5 w-5 mr-2 text-blue-500" />
+                    System Health
                   </h4>
-                  <div className="space-y-2">
-                    <div className="flex items-center p-2 bg-gray-50 rounded">
-                      <Package className="h-4 w-4 text-blue-500 mr-2" />
-                      <span className="text-sm">LangGraph Orchestration</span>
-                      <CheckCircle className="h-4 w-4 text-green-500 ml-auto" />
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Data Quality</span>
+                      <span className="text-sm font-semibold text-green-600">
+                        {dataIngestionMetrics.quality.accuracy.toFixed(1)}%
+                      </span>
                     </div>
-                    <div className="flex items-center p-2 bg-gray-50 rounded">
-                      <Clock className="h-4 w-4 text-green-500 mr-2" />
-                      <span className="text-sm">LangChain Agents</span>
-                      <CheckCircle className="h-4 w-4 text-green-500 ml-auto" />
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Risk Score</span>
+                      <span className="text-sm font-semibold text-yellow-600">
+                        {riskScoringMetrics.multiFactorAnalysis.overallScore.toFixed(1)}
+                      </span>
                     </div>
-                    <div className="flex items-center p-2 bg-gray-50 rounded">
-                      <TrendingUp className="h-4 w-4 text-purple-500 mr-2" />
-                      <span className="text-sm">RAG Knowledge Retrieval</span>
-                      <CheckCircle className="h-4 w-4 text-green-500 ml-auto" />
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">Notifications</span>
+                      <span className="text-sm font-semibold text-purple-600">
+                        {notificationMetrics.channelSelection.phone.sent + 
+                         notificationMetrics.channelSelection.email.sent + 
+                         notificationMetrics.channelSelection.sms.sent}
+                      </span>
                     </div>
-                    <div className="flex items-center p-2 bg-gray-50 rounded">
-                      <Package className="h-4 w-4 text-orange-500 mr-2" />
-                      <span className="text-sm">Supabase Real-time DB</span>
-                      <CheckCircle className="h-4 w-4 text-green-500 ml-auto" />
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">ROI</span>
+                      <span className="text-sm font-semibold text-indigo-600">
+                        {mitigationMetrics.roiCalculations.roiPercentage.toFixed(1)}%
+                      </span>
                     </div>
                   </div>
-
-                  <div className="mt-4 p-3 bg-green-50 rounded-lg">
-                    <div className="flex items-center">
-                      <AlertCircle className="h-5 w-5 text-green-600 mr-2" />
-                      <span className="text-sm font-medium text-green-800">
-                        Last Workflow:{" "}
+                </div>
+                
+                {/* Recent Agent Activity */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
+                    <Zap className="h-5 w-5 mr-2 text-yellow-500" />
+                    Agent Activity
+                  </h4>
+                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                    {[
+                      ...dataIngestionMetrics.activity.slice(0, 1),
+                      ...disruptionDetectionMetrics.activity.slice(0, 1),
+                      ...riskScoringMetrics.activity.slice(0, 1),
+                      ...notificationMetrics.activity.slice(0, 1),
+                      ...mitigationMetrics.activity.slice(0, 1)
+                    ]
+                      .sort((a, b) => b.id - a.id)
+                      .slice(0, 5)
+                      .map(activity => (
+                        <div key={activity.id} className="text-xs text-gray-600 border-l-2 border-blue-300 pl-2">
+                          <div className="font-medium">{activity.type || activity.event}</div>
+                          <div className="text-gray-500">{activity.time}</div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+                
+                {/* Workflow Status */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-semibold text-gray-800 mb-3 flex items-center">
+                    <CheckCircle className="h-5 w-5 mr-2 text-green-500" />
+                    Workflow Status
+                  </h4>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Status</span>
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        isRunning ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {isRunning ? 'Active' : 'Stopped'}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Last Run</span>
+                      <span className="text-xs text-gray-500">
                         {workflowStatus.lastExecution
-                          ? new Date(
-                              workflowStatus.lastExecution
-                            ).toLocaleTimeString()
+                          ? new Date(workflowStatus.lastExecution).toLocaleTimeString()
                           : "Not started"}
                       </span>
                     </div>
                     {workflowStatus.results && (
-                      <div className="mt-2 text-xs text-green-700">
-                        • {workflowStatus.results.disruptionsDetected}{" "}
-                        disruptions detected
-                        <br />• {workflowStatus.results.highRiskOrders}{" "}
-                        high-risk orders
-                        <br />• {workflowStatus.results.notificationsSent}{" "}
-                        notifications sent
-                      </div>
+                      <>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">Disruptions</span>
+                          <span className="text-xs font-semibold text-red-600">
+                            {workflowStatus.results.disruptionsDetected}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">High Risk Orders</span>
+                          <span className="text-xs font-semibold text-orange-600">
+                            {workflowStatus.results.highRiskOrders}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600">Notifications</span>
+                          <span className="text-xs font-semibold text-blue-600">
+                            {workflowStatus.results.notificationsSent}
+                          </span>
+                        </div>
+                      </>
                     )}
                   </div>
                 </div>
