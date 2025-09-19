@@ -16,6 +16,13 @@ import {
   Database,
   Activity,
   Globe,
+  Shield,
+  Target,
+  Zap,
+  Users,
+  DollarSign,
+  BarChart3,
+  Brain,
 } from "lucide-react";
 import { SupabaseService } from "./lib/supabase";
 import { SupplyChainWorkflow } from "./lib/langgraph";
@@ -56,6 +63,108 @@ const SupplyChainDashboard = () => {
       completeness: 94.7,
       freshness: 98.2,
       accuracy: 91.8
+    },
+    activity: []
+  });
+
+  // Enhanced Disruption Detection Agent State
+  const [disruptionDetectionMetrics, setDisruptionDetectionMetrics] = useState({
+    anomalyDetection: {
+      zScoreAnalysis: { alertsGenerated: 12, threshold: 2.5, status: 'active' },
+      ewmaAnalysis: { trendAccuracy: 94.2, deviations: 3, status: 'active' }
+    },
+    predictiveAnalytics: {
+      etaVarianceForecasting: { accuracy: 89.7, predictions: 156, status: 'active' },
+      supplierDelaySpikes: { detected: 4, prevented: 11, status: 'warning' }
+    },
+    ruleBasedEngine: {
+      slaMonitoring: { breaches: 2, warnings: 7, status: 'active' },
+      supplierAlerts: { critical: 1, warnings: 5, status: 'active' }
+    },
+    realTimeIndicators: {
+      portCongestion: { level: 'moderate', impact: 15, ports: ['LA', 'Long Beach'] },
+      weatherImpact: { severity: 'low', affectedRoutes: 3, status: 'monitoring' },
+      carrierPerformance: { avgDelay: 2.3, onTimeRate: 94.1, status: 'good' }
+    },
+    activity: []
+  });
+
+  // Risk Scoring Agent State
+  const [riskScoringMetrics, setRiskScoringMetrics] = useState({
+    riskModel: {
+      revenueAtRisk: 145680,
+      slaBreach: 23400,
+      customerLifetimeValue: 890000,
+      totalRiskExposure: 1059080
+    },
+    multiFactorAnalysis: {
+      priorityWeighting: 87.3,
+      supplierHealth: 91.5,
+      inventoryBuffers: 76.8,
+      overallScore: 85.2
+    },
+    thresholds: {
+      immediateResponse: 7,
+      emergencyEscalation: 2,
+      totalOrders: 45
+    },
+    mitigationCosts: {
+      airFreight: 45600,
+      alternativeSuppliers: 12300,
+      partialShipments: 8900,
+      totalOptions: 66800
+    },
+    activity: []
+  });
+
+  // Notification Agent State
+  const [notificationMetrics, setNotificationMetrics] = useState({
+    segmentation: {
+      vip: { count: 12, responseRate: 98.5, avgResponseTime: '2m' },
+      premium: { count: 34, responseRate: 94.2, avgResponseTime: '8m' },
+      standard: { count: 89, responseRate: 87.6, avgResponseTime: '15m' }
+    },
+    channelSelection: {
+      phone: { sent: 15, delivered: 14, effectiveness: 93.3 },
+      email: { sent: 67, opened: 58, effectiveness: 86.6 },
+      sms: { sent: 23, delivered: 23, effectiveness: 100 }
+    },
+    personalization: {
+      toneAdaptation: 96.7,
+      detailLevel: 91.4,
+      customerSatisfaction: 4.6
+    },
+    escalation: {
+      executiveInvolvements: 3,
+      criticalOrders: 5,
+      resolutionRate: 100
+    },
+    activity: []
+  });
+
+  // Mitigation Recommendation Agent State
+  const [mitigationMetrics, setMitigationMetrics] = useState({
+    costOptimization: {
+      shippingCosts: 67800,
+      inventoryCosts: 23400,
+      penaltyCosts: 15600,
+      totalOptimized: 106800
+    },
+    optionsAnalysis: {
+      airFreight: { cost: 45600, timeline: '2 days', probability: 95 },
+      alternateSuppliers: { cost: 12300, timeline: '5 days', probability: 87 },
+      inventoryReallocation: { cost: 8900, timeline: '1 day', probability: 92 }
+    },
+    roiCalculations: {
+      implementationCost: 66800,
+      riskReduction: 89400,
+      netBenefit: 22600,
+      roiPercentage: 33.8
+    },
+    feasibilityScoring: {
+      avgSuccessProbability: 91.3,
+      avgTimeline: 2.7,
+      recommendationsGenerated: 23
     },
     activity: []
   });
@@ -188,6 +297,107 @@ const SupplyChainDashboard = () => {
     };
 
     const interval = setInterval(updateDataIngestionMetrics, 3000); // Update every 3 seconds
+    return () => clearInterval(interval);
+  }, []);
+
+  // Real-time updates for all agent metrics
+  useEffect(() => {
+    const updateAgentMetrics = () => {
+      // Update Disruption Detection Agent
+      setDisruptionDetectionMetrics(prev => ({
+        ...prev,
+        anomalyDetection: {
+          ...prev.anomalyDetection,
+          zScoreAnalysis: {
+            ...prev.anomalyDetection.zScoreAnalysis,
+            alertsGenerated: prev.anomalyDetection.zScoreAnalysis.alertsGenerated + (Math.random() > 0.8 ? 1 : 0)
+          }
+        },
+        predictiveAnalytics: {
+          ...prev.predictiveAnalytics,
+          etaVarianceForecasting: {
+            ...prev.predictiveAnalytics.etaVarianceForecasting,
+            accuracy: Math.max(85, Math.min(95, prev.predictiveAnalytics.etaVarianceForecasting.accuracy + (Math.random() - 0.5) * 0.5))
+          }
+        },
+        activity: [{
+          id: Date.now(),
+          time: new Date().toLocaleTimeString(),
+          type: ['Anomaly Detected', 'ETA Variance Alert', 'SLA Warning', 'Supplier Alert'][Math.floor(Math.random() * 4)],
+          details: ['High Z-score deviation detected', 'ETA variance exceeds threshold', 'SLA breach imminent', 'Supplier delay spike predicted'][Math.floor(Math.random() * 4)],
+          severity: Math.random() > 0.7 ? 'high' : Math.random() > 0.4 ? 'medium' : 'low'
+        }, ...prev.activity.slice(0, 9)]
+      }));
+
+      // Update Risk Scoring Agent
+      setRiskScoringMetrics(prev => ({
+        ...prev,
+        riskModel: {
+          ...prev.riskModel,
+          revenueAtRisk: prev.riskModel.revenueAtRisk + Math.floor((Math.random() - 0.5) * 10000)
+        },
+        multiFactorAnalysis: {
+          ...prev.multiFactorAnalysis,
+          overallScore: Math.max(70, Math.min(95, prev.multiFactorAnalysis.overallScore + (Math.random() - 0.5) * 1.2))
+        },
+        activity: [{
+          id: Date.now(),
+          time: new Date().toLocaleTimeString(),
+          type: ['Risk Assessment', 'Score Update', 'Threshold Breach', 'Cost Analysis'][Math.floor(Math.random() * 4)],
+          details: ['Order risk recalculated', 'Multi-factor analysis updated', 'Emergency threshold exceeded', 'Mitigation costs analyzed'][Math.floor(Math.random() * 4)],
+          riskLevel: Math.random() > 0.6 ? 'high' : Math.random() > 0.3 ? 'medium' : 'low'
+        }, ...prev.activity.slice(0, 9)]
+      }));
+
+      // Update Notification Agent
+      setNotificationMetrics(prev => ({
+        ...prev,
+        channelSelection: {
+          phone: {
+            ...prev.channelSelection.phone,
+            sent: prev.channelSelection.phone.sent + (Math.random() > 0.9 ? 1 : 0)
+          },
+          email: {
+            ...prev.channelSelection.email,
+            sent: prev.channelSelection.email.sent + (Math.random() > 0.7 ? 1 : 0)
+          },
+          sms: {
+            ...prev.channelSelection.sms,
+            sent: prev.channelSelection.sms.sent + (Math.random() > 0.8 ? 1 : 0)
+          }
+        },
+        activity: [{
+          id: Date.now(),
+          time: new Date().toLocaleTimeString(),
+          type: ['Notification Sent', 'Channel Selected', 'Escalation Triggered', 'Response Received'][Math.floor(Math.random() * 4)],
+          details: ['VIP customer notified via phone', 'Email selected for premium customer', 'Executive escalation initiated', 'Customer acknowledged notification'][Math.floor(Math.random() * 4)],
+          channel: ['phone', 'email', 'sms'][Math.floor(Math.random() * 3)]
+        }, ...prev.activity.slice(0, 9)]
+      }));
+
+      // Update Mitigation Recommendation Agent
+      setMitigationMetrics(prev => ({
+        ...prev,
+        roiCalculations: {
+          ...prev.roiCalculations,
+          roiPercentage: Math.max(15, Math.min(50, prev.roiCalculations.roiPercentage + (Math.random() - 0.5) * 2))
+        },
+        feasibilityScoring: {
+          ...prev.feasibilityScoring,
+          avgSuccessProbability: Math.max(80, Math.min(98, prev.feasibilityScoring.avgSuccessProbability + (Math.random() - 0.5) * 0.8)),
+          recommendationsGenerated: prev.feasibilityScoring.recommendationsGenerated + (Math.random() > 0.8 ? 1 : 0)
+        },
+        activity: [{
+          id: Date.now(),
+          time: new Date().toLocaleTimeString(),
+          type: ['Recommendation Generated', 'Cost Optimized', 'ROI Calculated', 'Feasibility Assessed'][Math.floor(Math.random() * 4)],
+          details: ['Air freight option analyzed', 'Cost optimization completed', 'ROI calculation updated', 'Feasibility score improved'][Math.floor(Math.random() * 4)],
+          impact: Math.random() > 0.6 ? 'high' : Math.random() > 0.3 ? 'medium' : 'low'
+        }, ...prev.activity.slice(0, 9)]
+      }));
+    };
+
+    const interval = setInterval(updateAgentMetrics, 4000); // Update every 4 seconds
     return () => clearInterval(interval);
   }, []);
 
@@ -415,6 +625,26 @@ const SupplyChainDashboard = () => {
                 id: "data-ingestion",
                 label: "Data Ingestion Agent",
                 icon: Database,
+              },
+              {
+                id: "disruption-detection",
+                label: "Disruption Detection",
+                icon: Shield,
+              },
+              {
+                id: "risk-scoring",
+                label: "Risk Scoring",
+                icon: Target,
+              },
+              {
+                id: "intelligent-notification",
+                label: "Intelligent Notification",
+                icon: Users,
+              },
+              {
+                id: "mitigation-recommendation",
+                label: "Mitigation Engine",
+                icon: Brain,
               },
             ].map(({ id, label, icon: Icon }) => (
               <button
@@ -987,6 +1217,697 @@ const SupplyChainDashboard = () => {
                     </div>
                     <Database className="h-8 w-8 opacity-80" />
                   </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {selectedTab === "disruption-detection" && (
+            <div className="p-6">
+              <h3 className="text-lg font-semibold mb-6">Enhanced Disruption Detection Agent - Real-time Monitor</h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* ML-Based Anomaly Detection */}
+                <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <Shield className="h-6 w-6 text-red-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">ML-Based Anomaly Detection</h4>
+                    <div className="ml-auto flex items-center">
+                      <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse mr-2"></div>
+                      <span className="text-xs text-gray-600">Active</span>
+                    </div>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Z-Score Analysis</span>
+                        <div className="flex items-center">
+                          <BarChart3 className="h-4 w-4 text-red-500 mr-1" />
+                          <span className="text-sm text-red-600">{disruptionDetectionMetrics.anomalyDetection.zScoreAnalysis.alertsGenerated} alerts</span>
+                        </div>
+                      </div>
+                      <div className="text-sm text-gray-600">Threshold: {disruptionDetectionMetrics.anomalyDetection.zScoreAnalysis.threshold}σ</div>
+                      <div className={`mt-2 px-2 py-1 text-xs rounded-full inline-block ${
+                        disruptionDetectionMetrics.anomalyDetection.zScoreAnalysis.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {disruptionDetectionMetrics.anomalyDetection.zScoreAnalysis.status}
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">EWMA Trend Analysis</span>
+                        <span className="text-lg font-bold text-blue-600">{disruptionDetectionMetrics.anomalyDetection.ewmaAnalysis.trendAccuracy.toFixed(1)}%</span>
+                      </div>
+                      <div className="text-sm text-gray-600">Deviations detected: {disruptionDetectionMetrics.anomalyDetection.ewmaAnalysis.deviations}</div>
+                      <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                        <div className="bg-blue-500 h-2 rounded-full transition-all duration-1000" style={{width: `${disruptionDetectionMetrics.anomalyDetection.ewmaAnalysis.trendAccuracy}%`}}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Predictive Analytics */}
+                <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <Brain className="h-6 w-6 text-purple-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Predictive Analytics</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">ETA Variance Forecasting</span>
+                        <span className="text-lg font-bold text-purple-600">{disruptionDetectionMetrics.predictiveAnalytics.etaVarianceForecasting.accuracy.toFixed(1)}%</span>
+                      </div>
+                      <div className="text-sm text-gray-600">Predictions: {disruptionDetectionMetrics.predictiveAnalytics.etaVarianceForecasting.predictions}</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Supplier Delay Spike Detection</span>
+                        <div className="flex space-x-2">
+                          <span className="text-sm text-red-600">{disruptionDetectionMetrics.predictiveAnalytics.supplierDelaySpikes.detected} detected</span>
+                          <span className="text-sm text-green-600">{disruptionDetectionMetrics.predictiveAnalytics.supplierDelaySpikes.prevented} prevented</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Rule-Based Decision Engine */}
+                <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <Zap className="h-6 w-6 text-yellow-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Rule-Based Decision Engine</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">SLA Threshold Monitoring</span>
+                        <div className="flex space-x-2">
+                          <span className="text-sm text-red-600">{disruptionDetectionMetrics.ruleBasedEngine.slaMonitoring.breaches} breaches</span>
+                          <span className="text-sm text-yellow-600">{disruptionDetectionMetrics.ruleBasedEngine.slaMonitoring.warnings} warnings</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Supplier Alerts</span>
+                        <div className="flex space-x-2">
+                          <span className="px-2 py-1 bg-red-100 text-red-800 text-xs rounded-full">{disruptionDetectionMetrics.ruleBasedEngine.supplierAlerts.critical} critical</span>
+                          <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">{disruptionDetectionMetrics.ruleBasedEngine.supplierAlerts.warnings} warnings</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Real-time Indicators */}
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <Activity className="h-6 w-6 text-green-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Real-time Indicators</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Port Congestion</span>
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          disruptionDetectionMetrics.realTimeIndicators.portCongestion.level === 'high' ? 'bg-red-100 text-red-800' :
+                          disruptionDetectionMetrics.realTimeIndicators.portCongestion.level === 'moderate' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+                        }`}>
+                          {disruptionDetectionMetrics.realTimeIndicators.portCongestion.level}
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-600">Impact: {disruptionDetectionMetrics.realTimeIndicators.portCongestion.impact}% delay</div>
+                      <div className="text-xs text-gray-500">Affected: {disruptionDetectionMetrics.realTimeIndicators.portCongestion.ports.join(', ')}</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Carrier Performance</span>
+                        <span className="text-lg font-bold text-green-600">{disruptionDetectionMetrics.realTimeIndicators.carrierPerformance.onTimeRate}%</span>
+                      </div>
+                      <div className="text-sm text-gray-600">Avg Delay: {disruptionDetectionMetrics.realTimeIndicators.carrierPerformance.avgDelay} hours</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Activity Stream */}
+              <div className="mt-8 bg-white rounded-lg border p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-lg font-semibold">Live Disruption Detection Activity</h4>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse mr-2"></div>
+                    <span className="text-sm text-gray-600">Real-time</span>
+                  </div>
+                </div>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {disruptionDetectionMetrics.activity.map((activity) => (
+                    <div key={activity.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center">
+                        <div className={`w-2 h-2 rounded-full mr-3 ${
+                          activity.severity === 'high' ? 'bg-red-500' : 
+                          activity.severity === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                        }`}></div>
+                        <div>
+                          <div className="font-medium text-gray-900">{activity.type}</div>
+                          <div className="text-sm text-gray-600">{activity.details}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-500 mr-2">{activity.time}</span>
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          activity.severity === 'high' ? 'bg-red-100 text-red-800' : 
+                          activity.severity === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+                        }`}>
+                          {activity.severity}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {selectedTab === "risk-scoring" && (
+            <div className="p-6">
+              <h3 className="text-lg font-semibold mb-6">Sophisticated Risk Scoring Agent - Live Analysis</h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Comprehensive Risk Model */}
+                <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <Target className="h-6 w-6 text-red-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Comprehensive Risk Model</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Revenue at Risk</span>
+                        <span className="text-lg font-bold text-red-600">${riskScoringMetrics.riskModel.revenueAtRisk.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">SLA Breach Costs</span>
+                        <span className="text-lg font-bold text-orange-600">${riskScoringMetrics.riskModel.slaBreach.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Customer Lifetime Value</span>
+                        <span className="text-lg font-bold text-green-600">${riskScoringMetrics.riskModel.customerLifetimeValue.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="bg-gradient-to-r from-red-500 to-red-600 rounded-lg p-4 text-white">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">Total Risk Exposure</span>
+                        <span className="text-xl font-bold">${riskScoringMetrics.riskModel.totalRiskExposure.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Multi-factor Analysis */}
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <BarChart3 className="h-6 w-6 text-blue-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Multi-factor Analysis</h4>
+                  </div>
+                  <div className="space-y-4">
+                    {Object.entries(riskScoringMetrics.multiFactorAnalysis).map(([key, value]) => (
+                      <div key={key} className="bg-white rounded-lg p-4 shadow-sm">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium text-gray-900">
+                            {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                          </span>
+                          <span className={`text-lg font-bold ${
+                            value > 90 ? 'text-green-600' : 
+                            value > 80 ? 'text-blue-600' : 'text-orange-600'
+                          }`}>
+                            {value.toFixed(1)}
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className={`h-2 rounded-full transition-all duration-1000 ${
+                              value > 90 ? 'bg-green-500' : 
+                              value > 80 ? 'bg-blue-500' : 'bg-orange-500'
+                            }`}
+                            style={{width: `${value}%`}}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Dynamic Thresholds */}
+                <div className="bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <AlertTriangle className="h-6 w-6 text-yellow-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Dynamic Thresholds</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Immediate Response (70+)</span>
+                        <span className="text-lg font-bold text-orange-600">{riskScoringMetrics.thresholds.immediateResponse} orders</span>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Emergency Escalation (85+)</span>
+                        <span className="text-lg font-bold text-red-600">{riskScoringMetrics.thresholds.emergencyEscalation} orders</span>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Total Orders Analyzed</span>
+                        <span className="text-lg font-bold text-gray-700">{riskScoringMetrics.thresholds.totalOrders}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Mitigation Cost-Benefit */}
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <DollarSign className="h-6 w-6 text-green-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Mitigation Cost-Benefit</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Air Freight Options</span>
+                        <span className="text-lg font-bold text-blue-600">${riskScoringMetrics.mitigationCosts.airFreight.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Alternative Suppliers</span>
+                        <span className="text-lg font-bold text-orange-600">${riskScoringMetrics.mitigationCosts.alternativeSuppliers.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Partial Shipments</span>
+                        <span className="text-lg font-bold text-green-600">${riskScoringMetrics.mitigationCosts.partialShipments.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Activity Stream */}
+              <div className="mt-8 bg-white rounded-lg border p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-lg font-semibold">Live Risk Scoring Activity</h4>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-red-500 rounded-full animate-pulse mr-2"></div>
+                    <span className="text-sm text-gray-600">Real-time Analysis</span>
+                  </div>
+                </div>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {riskScoringMetrics.activity.map((activity) => (
+                    <div key={activity.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center">
+                        <div className={`w-2 h-2 rounded-full mr-3 ${
+                          activity.riskLevel === 'high' ? 'bg-red-500' : 
+                          activity.riskLevel === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
+                        }`}></div>
+                        <div>
+                          <div className="font-medium text-gray-900">{activity.type}</div>
+                          <div className="text-sm text-gray-600">{activity.details}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-500 mr-2">{activity.time}</span>
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          activity.riskLevel === 'high' ? 'bg-red-100 text-red-800' : 
+                          activity.riskLevel === 'medium' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+                        }`}>
+                          {activity.riskLevel} risk
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {selectedTab === "intelligent-notification" && (
+            <div className="p-6">
+              <h3 className="text-lg font-semibold mb-6">Intelligent Notification Agent - Communication Hub</h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Tiered Communication Strategy */}
+                <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <Users className="h-6 w-6 text-purple-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Tiered Communication Strategy</h4>
+                  </div>
+                  <div className="space-y-4">
+                    {Object.entries(notificationMetrics.segmentation).map(([tier, data]) => (
+                      <div key={tier} className="bg-white rounded-lg p-4 shadow-sm">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className={`font-medium text-gray-900 px-2 py-1 rounded-full text-sm ${
+                            tier === 'vip' ? 'bg-gold-100 text-gold-800' :
+                            tier === 'premium' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {tier.toUpperCase()}
+                          </span>
+                          <span className="text-lg font-bold text-gray-700">{data.count} customers</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Response Rate: {data.responseRate}%</span>
+                          <span className="text-gray-600">Avg Response: {data.avgResponseTime}</span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                          <div className="bg-purple-500 h-2 rounded-full transition-all duration-1000" style={{width: `${data.responseRate}%`}}></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Smart Channel Selection */}
+                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <MessageSquare className="h-6 w-6 text-blue-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Smart Channel Selection</h4>
+                  </div>
+                  <div className="space-y-4">
+                    {Object.entries(notificationMetrics.channelSelection).map(([channel, data]) => (
+                      <div key={channel} className="bg-white rounded-lg p-4 shadow-sm">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center">
+                            {channel === 'phone' && <Phone className="h-4 w-4 text-green-600 mr-2" />}
+                            {channel === 'email' && <Mail className="h-4 w-4 text-blue-600 mr-2" />}
+                            {channel === 'sms' && <MessageSquare className="h-4 w-4 text-purple-600 mr-2" />}
+                            <span className="font-medium text-gray-900 capitalize">{channel}</span>
+                          </div>
+                          <span className="text-lg font-bold text-gray-700">{data.sent} sent</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">
+                            {channel === 'phone' ? `${data.delivered} answered` : 
+                             channel === 'email' ? `${data.opened || data.delivered} opened` : 
+                             `${data.delivered} delivered`}
+                          </span>
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            data.effectiveness > 95 ? 'bg-green-100 text-green-800' :
+                            data.effectiveness > 90 ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {data.effectiveness.toFixed(1)}% effective
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Personalized Messaging */}
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <Target className="h-6 w-6 text-green-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Personalized Messaging</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Tone Adaptation</span>
+                        <span className="text-lg font-bold text-green-600">{notificationMetrics.personalization.toneAdaptation}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-green-500 h-2 rounded-full transition-all duration-1000" style={{width: `${notificationMetrics.personalization.toneAdaptation}%`}}></div>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Detail Level Optimization</span>
+                        <span className="text-lg font-bold text-blue-600">{notificationMetrics.personalization.detailLevel}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-blue-500 h-2 rounded-full transition-all duration-1000" style={{width: `${notificationMetrics.personalization.detailLevel}%`}}></div>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Customer Satisfaction</span>
+                        <div className="flex items-center">
+                          <span className="text-lg font-bold text-purple-600">{notificationMetrics.personalization.customerSatisfaction}/5.0</span>
+                          <span className="text-yellow-500 ml-1">★</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Escalation Protocols */}
+                <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <AlertTriangle className="h-6 w-6 text-red-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Escalation Protocols</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Executive Involvements</span>
+                        <span className="text-lg font-bold text-red-600">{notificationMetrics.escalation.executiveInvolvements}</span>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Critical Orders</span>
+                        <span className="text-lg font-bold text-orange-600">{notificationMetrics.escalation.criticalOrders}</span>
+                      </div>
+                    </div>
+                    <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-4 text-white">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">Resolution Rate</span>
+                        <span className="text-xl font-bold">{notificationMetrics.escalation.resolutionRate}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Activity Stream */}
+              <div className="mt-8 bg-white rounded-lg border p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-lg font-semibold">Live Notification Activity</h4>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse mr-2"></div>
+                    <span className="text-sm text-gray-600">Real-time</span>
+                  </div>
+                </div>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {notificationMetrics.activity.map((activity) => (
+                    <div key={activity.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center">
+                        <div className={`w-2 h-2 rounded-full mr-3 ${
+                          activity.channel === 'phone' ? 'bg-green-500' : 
+                          activity.channel === 'email' ? 'bg-blue-500' : 'bg-purple-500'
+                        }`}></div>
+                        <div>
+                          <div className="font-medium text-gray-900">{activity.type}</div>
+                          <div className="text-sm text-gray-600">{activity.details}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-500 mr-2">{activity.time}</span>
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          activity.channel === 'phone' ? 'bg-green-100 text-green-800' : 
+                          activity.channel === 'email' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                        }`}>
+                          {activity.channel}
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {selectedTab === "mitigation-recommendation" && (
+            <div className="p-6">
+              <h3 className="text-lg font-semibold mb-6">Mitigation Recommendation Agent - Optimization Engine</h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Cost Optimization Engine */}
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <DollarSign className="h-6 w-6 text-green-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Cost Optimization Engine</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Shipping Costs</span>
+                        <span className="text-lg font-bold text-blue-600">${mitigationMetrics.costOptimization.shippingCosts.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Inventory Costs</span>
+                        <span className="text-lg font-bold text-orange-600">${mitigationMetrics.costOptimization.inventoryCosts.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Penalty Costs</span>
+                        <span className="text-lg font-bold text-red-600">${mitigationMetrics.costOptimization.penaltyCosts.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="bg-gradient-to-r from-green-500 to-green-600 rounded-lg p-4 text-white">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">Total Optimized</span>
+                        <span className="text-xl font-bold">${mitigationMetrics.costOptimization.totalOptimized.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Multiple Options Analysis */}
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <BarChart3 className="h-6 w-6 text-blue-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Multiple Options Analysis</h4>
+                  </div>
+                  <div className="space-y-4">
+                    {Object.entries(mitigationMetrics.optionsAnalysis).map(([option, data]) => (
+                      <div key={option} className="bg-white rounded-lg p-4 shadow-sm">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="font-medium text-gray-900">
+                            {option.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                          </span>
+                          <span className="text-lg font-bold text-blue-600">${data.cost.toLocaleString()}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm mb-2">
+                          <span className="text-gray-600">Timeline: {data.timeline}</span>
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            data.probability > 90 ? 'bg-green-100 text-green-800' : 
+                            data.probability > 80 ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
+                          }`}>
+                            {data.probability}% success
+                          </span>
+                        </div>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div 
+                            className={`h-2 rounded-full transition-all duration-1000 ${
+                              data.probability > 90 ? 'bg-green-500' : 
+                              data.probability > 80 ? 'bg-blue-500' : 'bg-yellow-500'
+                            }`}
+                            style={{width: `${data.probability}%`}}
+                          ></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* ROI Calculations */}
+                <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <TrendingUp className="h-6 w-6 text-purple-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">ROI Calculations</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Implementation Cost</span>
+                        <span className="text-lg font-bold text-red-600">${mitigationMetrics.roiCalculations.implementationCost.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Risk Reduction Value</span>
+                        <span className="text-lg font-bold text-green-600">${mitigationMetrics.roiCalculations.riskReduction.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Net Benefit</span>
+                        <span className="text-lg font-bold text-blue-600">${mitigationMetrics.roiCalculations.netBenefit.toLocaleString()}</span>
+                      </div>
+                    </div>
+                    <div className="bg-gradient-to-r from-purple-500 to-purple-600 rounded-lg p-4 text-white">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">ROI Percentage</span>
+                        <span className="text-xl font-bold">{mitigationMetrics.roiCalculations.roiPercentage.toFixed(1)}%</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Feasibility Scoring */}
+                <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <CheckCircle className="h-6 w-6 text-orange-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Feasibility Scoring</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Average Success Probability</span>
+                        <span className="text-lg font-bold text-green-600">{mitigationMetrics.feasibilityScoring.avgSuccessProbability.toFixed(1)}%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-green-500 h-2 rounded-full transition-all duration-1000" style={{width: `${mitigationMetrics.feasibilityScoring.avgSuccessProbability}%`}}></div>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Average Timeline</span>
+                        <span className="text-lg font-bold text-blue-600">{mitigationMetrics.feasibilityScoring.avgTimeline.toFixed(1)} days</span>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Recommendations Generated</span>
+                        <span className="text-lg font-bold text-purple-600">{mitigationMetrics.feasibilityScoring.recommendationsGenerated}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Live Activity Stream */}
+              <div className="mt-8 bg-white rounded-lg border p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-lg font-semibold">Live Mitigation Activity</h4>
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 bg-purple-500 rounded-full animate-pulse mr-2"></div>
+                    <span className="text-sm text-gray-600">Optimization Engine</span>
+                  </div>
+                </div>
+                <div className="space-y-2 max-h-64 overflow-y-auto">
+                  {mitigationMetrics.activity.map((activity) => (
+                    <div key={activity.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                      <div className="flex items-center">
+                        <div className={`w-2 h-2 rounded-full mr-3 ${
+                          activity.impact === 'high' ? 'bg-green-500' : 
+                          activity.impact === 'medium' ? 'bg-blue-500' : 'bg-yellow-500'
+                        }`}></div>
+                        <div>
+                          <div className="font-medium text-gray-900">{activity.type}</div>
+                          <div className="text-sm text-gray-600">{activity.details}</div>
+                        </div>
+                      </div>
+                      <div className="flex items-center">
+                        <span className="text-sm text-gray-500 mr-2">{activity.time}</span>
+                        <span className={`px-2 py-1 text-xs rounded-full ${
+                          activity.impact === 'high' ? 'bg-green-100 text-green-800' : 
+                          activity.impact === 'medium' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {activity.impact} impact
+                        </span>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
