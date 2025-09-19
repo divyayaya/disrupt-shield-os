@@ -717,7 +717,7 @@ const SupplyChainDashboard = () => {
                     {/* Connection Lines from Agents to Central Database */}
                     {/* Data Ingestion Agent to Database */}
                     <path
-                      d="M 150 150 L 340 250"
+                      d="M 100 100 L 340 190"
                       stroke="#3b82f6"
                       strokeWidth="3"
                       fill="none"
@@ -728,7 +728,7 @@ const SupplyChainDashboard = () => {
                     
                     {/* Disruption Detection Agent to Database */}
                     <path
-                      d="M 250 100 L 360 190"
+                      d="M 250 80 L 360 190"
                       stroke="#10b981"
                       strokeWidth="3"
                       fill="none"
@@ -739,7 +739,7 @@ const SupplyChainDashboard = () => {
                     
                     {/* Risk Scoring Agent to Database */}
                     <path
-                      d="M 550 150 L 460 190"
+                      d="M 700 100 L 460 190"
                       stroke="#f59e0b"
                       strokeWidth="3"
                       fill="none"
@@ -750,7 +750,7 @@ const SupplyChainDashboard = () => {
                     
                     {/* Notification Agent to Database */}
                     <path
-                      d="M 650 350 L 460 310"
+                      d="M 700 400 L 460 310"
                       stroke="#6366f1"
                       strokeWidth="3"
                       fill="none"
@@ -761,7 +761,7 @@ const SupplyChainDashboard = () => {
                     
                     {/* Mitigation Agent to Database */}
                     <path
-                      d="M 650 100 L 460 190"
+                      d="M 100 400 L 340 310"
                       stroke="#8b5cf6"
                       strokeWidth="3"
                       fill="none"
@@ -770,9 +770,9 @@ const SupplyChainDashboard = () => {
                       markerEnd="url(#arrowhead)"
                     />
                     
-                    {/* Agent Nodes */}
-                    {/* Data Ingestion Agent */}
-                    <g transform="translate(100, 100)">
+                    {/* Agent Nodes - Spread out in pentagon formation around center */}
+                    {/* Data Ingestion Agent - Top Left */}
+                    <g transform="translate(50, 50)">
                       <circle 
                         cx="50" 
                         cy="50" 
@@ -791,8 +791,8 @@ const SupplyChainDashboard = () => {
                       </text>
                     </g>
                     
-                    {/* Disruption Detection Agent */}
-                    <g transform="translate(200, 50)">
+                    {/* Disruption Detection Agent - Top Center */}
+                    <g transform="translate(200, 30)">
                       <circle 
                         cx="50" 
                         cy="50" 
@@ -811,8 +811,8 @@ const SupplyChainDashboard = () => {
                       </text>
                     </g>
                     
-                    {/* Risk Scoring Agent */}
-                    <g transform="translate(500, 100)">
+                    {/* Risk Scoring Agent - Top Right */}
+                    <g transform="translate(650, 50)">
                       <circle 
                         cx="50" 
                         cy="50" 
@@ -831,8 +831,8 @@ const SupplyChainDashboard = () => {
                       </text>
                     </g>
                     
-                    {/* Notification Agent */}
-                    <g transform="translate(600, 300)">
+                    {/* Notification Agent - Bottom Right */}
+                    <g transform="translate(650, 350)">
                       <circle 
                         cx="50" 
                         cy="50" 
@@ -851,8 +851,8 @@ const SupplyChainDashboard = () => {
                       </text>
                     </g>
                     
-                    {/* Mitigation Recommendation Agent */}
-                    <g transform="translate(600, 50)">
+                    {/* Mitigation Recommendation Agent - Bottom Left */}
+                    <g transform="translate(50, 350)">
                       <circle 
                         cx="50" 
                         cy="50" 
@@ -871,49 +871,54 @@ const SupplyChainDashboard = () => {
                       </text>
                     </g>
                     
-                    {/* Database Access Indicators - Only show when agents are actually reading/writing */}
+                    {/* Database Access Indicators - Only show along the connection paths */}
                     {dataIngestionMetrics.activity.length > 0 && (
                       <>
-                        <circle cx="245" cy="200" r="4" fill="#3b82f6" className="animate-ping">
+                        <circle cx="220" cy="145" r="4" fill="#3b82f6" className="animate-ping">
                           <animate attributeName="r" values="2;8;2" dur="1.5s" repeatCount="indefinite"/>
+                          <animateMotion dur="3s" repeatCount="indefinite" path="M 100 100 L 340 190" />
                         </circle>
-                        <text x="245" y="185" textAnchor="middle" className="text-xs fill-blue-600 font-semibold">WRITE</text>
+                        <text x="220" y="130" textAnchor="middle" className="text-xs fill-blue-600 font-semibold">WRITE</text>
                       </>
                     )}
                     
                     {disruptionDetectionMetrics.activity.length > 0 && (
                       <>
-                        <circle cx="305" cy="145" r="4" fill="#10b981" className="animate-ping">
+                        <circle cx="305" cy="135" r="4" fill="#10b981" className="animate-ping">
                           <animate attributeName="r" values="2;8;2" dur="1.5s" repeatCount="indefinite"/>
+                          <animateMotion dur="3s" repeatCount="indefinite" path="M 250 80 L 360 190" />
                         </circle>
-                        <text x="305" y="130" textAnchor="middle" className="text-xs fill-green-600 font-semibold">READ</text>
+                        <text x="305" y="120" textAnchor="middle" className="text-xs fill-green-600 font-semibold">READ</text>
                       </>
                     )}
                     
                     {riskScoringMetrics.activity.length > 0 && (
                       <>
-                        <circle cx="495" cy="145" r="4" fill="#f59e0b" className="animate-ping">
+                        <circle cx="580" cy="145" r="4" fill="#f59e0b" className="animate-ping">
                           <animate attributeName="r" values="2;8;2" dur="1.5s" repeatCount="indefinite"/>
+                          <animateMotion dur="3s" repeatCount="indefinite" path="M 700 100 L 460 190" />
                         </circle>
-                        <text x="495" y="130" textAnchor="middle" className="text-xs fill-yellow-600 font-semibold">UPDATE</text>
+                        <text x="580" y="130" textAnchor="middle" className="text-xs fill-yellow-600 font-semibold">UPDATE</text>
                       </>
                     )}
                     
                     {notificationMetrics.activity.length > 0 && (
                       <>
-                        <circle cx="555" cy="280" r="4" fill="#6366f1" className="animate-ping">
+                        <circle cx="580" cy="355" r="4" fill="#6366f1" className="animate-ping">
                           <animate attributeName="r" values="2;8;2" dur="1.5s" repeatCount="indefinite"/>
+                          <animateMotion dur="3s" repeatCount="indefinite" path="M 700 400 L 460 310" />
                         </circle>
-                        <text x="555" y="265" textAnchor="middle" className="text-xs fill-indigo-600 font-semibold">READ</text>
+                        <text x="580" y="370" textAnchor="middle" className="text-xs fill-indigo-600 font-semibold">READ</text>
                       </>
                     )}
                     
                     {mitigationMetrics.activity.length > 0 && (
                       <>
-                        <circle cx="505" cy="145" r="4" fill="#8b5cf6" className="animate-ping">
+                        <circle cx="220" cy="355" r="4" fill="#8b5cf6" className="animate-ping">
                           <animate attributeName="r" values="2;8;2" dur="1.5s" repeatCount="indefinite"/>
+                          <animateMotion dur="3s" repeatCount="indefinite" path="M 100 400 L 340 310" />
                         </circle>
-                        <text x="505" y="130" textAnchor="middle" className="text-xs fill-purple-600 font-semibold">READ</text>
+                        <text x="220" y="370" textAnchor="middle" className="text-xs fill-purple-600 font-semibold">READ</text>
                       </>
                     )}
                   </svg>
