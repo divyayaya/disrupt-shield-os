@@ -506,7 +506,7 @@ const SupplyChainDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    <div className="min-h-screen bg-gray-50 p-3 sm:p-6">
       {/* Connection Test */}
       <SupabaseConnectionTest 
         onResult={(isConnected, error) => setConnectionStatus({ isConnected, error })}
@@ -514,53 +514,55 @@ const SupplyChainDashboard = () => {
       
       {/* Connection Status Banner */}
       {!connectionStatus.isConnected && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-3 sm:px-4 py-3 rounded mb-4 sm:mb-6 text-sm">
           <strong>Connection Error:</strong> {connectionStatus.error || 'Failed to connect to Supabase'}
         </div>
       )}
       
       {connectionStatus.isConnected && (
-        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+        <div className="bg-green-100 border border-green-400 text-green-700 px-3 sm:px-4 py-3 rounded mb-4 sm:mb-6 text-sm">
           <strong>✓ Supabase Connected:</strong> Database connection is working properly
         </div>
       )}
       
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
                 Supply Chain Intelligence Center
               </h1>
-              <p className="text-gray-600 mt-2">
+              <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">
                 LangGraph Multi-Agent System with RAG & Supabase
               </p>
             </div>
-            <div className="flex items-center space-x-4">
-              <div
-                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  isRunning
-                    ? "bg-green-100 text-green-800"
-                    : "bg-gray-100 text-gray-800"
-                }`}
-              >
-                {isRunning ? "System Active" : "System Idle"}
-              </div>
-              <div
-                className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  workflowStatus.status === "completed"
-                    ? "bg-blue-100 text-blue-800"
-                    : workflowStatus.status === "failed"
-                    ? "bg-red-100 text-red-800"
-                    : "bg-gray-100 text-gray-800"
-                }`}
-              >
-                Workflow: {workflowStatus.status}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+              <div className="flex items-center gap-2 sm:gap-4">
+                <div
+                  className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
+                    isRunning
+                      ? "bg-green-100 text-green-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {isRunning ? "Active" : "Idle"}
+                </div>
+                <div
+                  className={`px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
+                    workflowStatus.status === "completed"
+                      ? "bg-blue-100 text-blue-800"
+                      : workflowStatus.status === "failed"
+                      ? "bg-red-100 text-red-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
+                >
+                  {workflowStatus.status}
+                </div>
               </div>
               <button
                 onClick={isRunning ? handleStop : handleStart}
-                className={`flex items-center px-6 py-2 rounded-lg font-medium ${
+                className={`flex items-center justify-center px-4 sm:px-6 py-2 rounded-lg font-medium text-sm sm:text-base w-full sm:w-auto ${
                   isRunning
                     ? "bg-red-600 hover:bg-red-700 text-white"
                     : "bg-blue-600 hover:bg-blue-700 text-white"
@@ -583,57 +585,57 @@ const SupplyChainDashboard = () => {
         </div>
 
         {/* Key Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg p-6 shadow-sm border">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
+          <div className="bg-white rounded-lg p-3 sm:p-6 shadow-sm border">
             <div className="flex items-center">
-              <AlertTriangle className="h-8 w-8 text-red-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">
+              <AlertTriangle className="h-6 w-6 sm:h-8 sm:w-8 text-red-500 flex-shrink-0" />
+              <div className="ml-2 sm:ml-4 min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600">
                   High Risk Orders
                 </p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">
                   {dashboardData.highRiskOrders}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-6 shadow-sm border">
+          <div className="bg-white rounded-lg p-3 sm:p-6 shadow-sm border">
             <div className="flex items-center">
-              <Package className="h-8 w-8 text-orange-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">
+              <Package className="h-6 w-6 sm:h-8 sm:w-8 text-orange-500 flex-shrink-0" />
+              <div className="ml-2 sm:ml-4 min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600">
                   Active Disruptions
                 </p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">
                   {dashboardData.activeDisruptions}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-6 shadow-sm border">
+          <div className="bg-white rounded-lg p-3 sm:p-6 shadow-sm border">
             <div className="flex items-center">
-              <Bell className="h-8 w-8 text-blue-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">
+              <Bell className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500 flex-shrink-0" />
+              <div className="ml-2 sm:ml-4 min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600">
                   Pending Alerts
                 </p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">
                   {dashboardData.pendingNotifications}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-6 shadow-sm border">
+          <div className="bg-white rounded-lg p-3 sm:p-6 shadow-sm border">
             <div className="flex items-center">
-              <TrendingUp className="h-8 w-8 text-green-500" />
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">
+              <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-green-500 flex-shrink-0" />
+              <div className="ml-2 sm:ml-4 min-w-0">
+                <p className="text-xs sm:text-sm font-medium text-gray-600">
                   Avg Risk Score
                 </p>
-                <p className="text-2xl font-bold text-gray-900">
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">
                   {dashboardData.avgRiskScore}
                 </p>
               </div>
@@ -642,71 +644,80 @@ const SupplyChainDashboard = () => {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="mb-6">
-          <nav className="flex space-x-8">
-            {[
-              { id: "overview", label: "LangGraph Overview", icon: Package },
-              { id: "orders", label: "Risk Orders", icon: AlertTriangle },
-              { id: "suppliers", label: "Suppliers", icon: Truck },
-              {
-                id: "notifications",
-                label: "AI Notifications",
-                icon: MessageSquare,
-              },
-              {
-                id: "data-ingestion",
-                label: "Data Ingestion Agent",
-                icon: Database,
-              },
-              {
-                id: "disruption-detection",
-                label: "Disruption Detection",
-                icon: Shield,
-              },
-              {
-                id: "risk-scoring",
-                label: "Risk Scoring",
-                icon: Target,
-              },
-              {
-                id: "intelligent-notification",
-                label: "Intelligent Notification",
-                icon: Users,
-              },
-              {
-                id: "mitigation-recommendation",
-                label: "Mitigation Engine",
-                icon: Brain,
-              },
-            ].map(({ id, label, icon: Icon }) => (
-              <button
-                key={id}
-                onClick={() => setSelectedTab(id)}
-                className={`flex items-center px-3 py-2 text-sm font-medium rounded-md ${
-                  selectedTab === id
-                    ? "bg-blue-100 text-blue-700"
-                    : "text-gray-500 hover:text-gray-700"
-                }`}
-              >
-                <Icon className="h-4 w-4 mr-2" />
-                {label}
-              </button>
-            ))}
+        <div className="mb-4 sm:mb-6">
+          <nav className="flex overflow-x-auto pb-2 sm:pb-0">
+            <div className="flex space-x-2 sm:space-x-4 lg:space-x-8 min-w-max">
+              {[
+                { id: "overview", label: "Overview", shortLabel: "Overview", icon: Package },
+                { id: "orders", label: "Risk Orders", shortLabel: "Orders", icon: AlertTriangle },
+                { id: "suppliers", label: "Suppliers", shortLabel: "Suppliers", icon: Truck },
+                {
+                  id: "notifications",
+                  label: "AI Notifications",
+                  shortLabel: "Notifications",
+                  icon: MessageSquare,
+                },
+                {
+                  id: "data-ingestion",
+                  label: "Data Ingestion",
+                  shortLabel: "Data",
+                  icon: Database,
+                },
+                {
+                  id: "disruption-detection",
+                  label: "Disruption Detection",
+                  shortLabel: "Disruption",
+                  icon: Shield,
+                },
+                {
+                  id: "risk-scoring",
+                  label: "Risk Scoring",
+                  shortLabel: "Risk",
+                  icon: Target,
+                },
+                {
+                  id: "intelligent-notification",
+                  label: "Smart Notifications",
+                  shortLabel: "Smart",
+                  icon: Users,
+                },
+                {
+                  id: "mitigation-recommendation",
+                  label: "Mitigation Engine",
+                  shortLabel: "Engine",
+                  icon: Brain,
+                },
+              ].map(({ id, label, shortLabel, icon: Icon }) => (
+                <button
+                  key={id}
+                  onClick={() => setSelectedTab(id)}
+                  className={`flex items-center px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-md whitespace-nowrap ${
+                    selectedTab === id
+                      ? "bg-blue-100 text-blue-700"
+                      : "text-gray-500 hover:text-gray-700"
+                  }`}
+                >
+                  <Icon className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2 flex-shrink-0" />
+                  <span className="hidden sm:inline">{label}</span>
+                  <span className="sm:hidden">{shortLabel}</span>
+                </button>
+              ))}
+            </div>
           </nav>
         </div>
 
         {/* Tab Content */}
         <div className="bg-white rounded-lg shadow-sm border">
           {selectedTab === "overview" && (
-            <div className="p-6">
-              <h3 className="text-lg font-semibold mb-6">
+            <div className="p-3 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">
                 LangGraph Multi-Agent System - Real-Time Flow
               </h3>
               
               {/* Real-time Visual Graph */}
-              <div className="mb-8">
-                <div className="relative bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-8 min-h-[600px] border-2 border-blue-100">
-                  <svg width="100%" height="500" className="overflow-visible">
+              <div className="mb-6 sm:mb-8">
+                <div className="relative bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl p-4 sm:p-8 min-h-[400px] sm:min-h-[600px] border-2 border-blue-100 overflow-x-auto">
+                  <svg width="800" height="500" viewBox="0 0 800 500" className="min-w-[800px] sm:w-full sm:min-w-0">
                     {/* Background Grid */}
                     <defs>
                       <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
@@ -1100,79 +1111,81 @@ const SupplyChainDashboard = () => {
           )}
 
           {selectedTab === "orders" && (
-            <div className="p-6">
-              <h3 className="text-lg font-semibold mb-4">
+            <div className="p-3 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold mb-4">
                 High Risk Orders (Live Data from Supabase)
               </h3>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Order Number
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Customer
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Value
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Risk Score
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Status
-                      </th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                        Expected Delivery
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {orders
-                      .filter((order) => (order.risk_score || 0) >= 50)
-                      .sort((a, b) => (b.risk_score || 0) - (a.risk_score || 0))
-                      .slice(0, 10)
-                      .map((order) => (
-                        <tr key={order.id}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            {order.order_number}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {order.customer?.name || "Unknown"}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            ${(order.value || 0).toLocaleString()}
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span
-                              className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRiskColor(
-                                order.risk_score || 0
-                              )}`}
-                            >
-                              {order.risk_score || 0}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap">
-                            <span
-                              className={`text-sm font-medium capitalize ${getStatusColor(
-                                order.status
-                              )}`}
-                            >
-                              {order.status}
-                            </span>
-                          </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                            {order.expected_delivery
-                              ? new Date(
-                                  order.expected_delivery
-                                ).toLocaleDateString()
-                              : "TBD"}
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
+              <div className="overflow-x-auto -mx-3 sm:mx-0">
+                <div className="min-w-full inline-block align-middle">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Order
+                        </th>
+                        <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Customer
+                        </th>
+                        <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                          Value
+                        </th>
+                        <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Risk
+                        </th>
+                        <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Status
+                        </th>
+                        <th className="px-3 py-2 sm:px-6 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">
+                          ETA
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {orders
+                        .filter((order) => (order.risk_score || 0) >= 50)
+                        .sort((a, b) => (b.risk_score || 0) - (a.risk_score || 0))
+                        .slice(0, 10)
+                        .map((order) => (
+                          <tr key={order.id} className="hover:bg-gray-50">
+                            <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
+                              {order.order_number}
+                            </td>
+                            <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                              {order.customer?.name || "Unknown"}
+                            </td>
+                            <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden sm:table-cell">
+                              ${(order.value || 0).toLocaleString()}
+                            </td>
+                            <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap">
+                              <span
+                                className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getRiskColor(
+                                  order.risk_score || 0
+                                )}`}
+                              >
+                                {order.risk_score || 0}
+                              </span>
+                            </td>
+                            <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap">
+                              <span
+                                className={`text-xs sm:text-sm font-medium capitalize ${getStatusColor(
+                                  order.status
+                                )}`}
+                              >
+                                {order.status}
+                              </span>
+                            </td>
+                            <td className="px-3 py-2 sm:px-6 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden lg:table-cell">
+                              {order.expected_delivery
+                                ? new Date(
+                                    order.expected_delivery
+                                  ).toLocaleDateString()
+                                : "TBD"}
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
                 {orders.filter((o) => (o.risk_score || 0) >= 50).length ===
                   0 && (
                   <div className="text-center py-8 text-gray-500">
@@ -1295,10 +1308,10 @@ const SupplyChainDashboard = () => {
           )}
 
           {selectedTab === "data-ingestion" && (
-            <div className="p-6">
-              <h3 className="text-lg font-semibold mb-6">Advanced Data Ingestion Agent - Real-time Monitor</h3>
+            <div className="p-3 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">Advanced Data Ingestion Agent - Real-time Monitor</h3>
               
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                 {/* Real-time External Data Feeds */}
                 <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border">
                   <div className="flex items-center mb-4">
@@ -1496,7 +1509,7 @@ const SupplyChainDashboard = () => {
               </div>
 
               {/* System Performance Indicators */}
-              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="mt-4 sm:mt-6 grid grid-cols-1 lg:grid-cols-3 gap-3 sm:gap-4">
                 <div className="bg-gradient-to-r from-blue-500 to-blue-600 rounded-lg p-4 text-white">
                   <div className="flex items-center justify-between">
                     <div>
@@ -1535,10 +1548,10 @@ const SupplyChainDashboard = () => {
           )}
 
           {selectedTab === "disruption-detection" && (
-            <div className="p-6">
-              <h3 className="text-lg font-semibold mb-6">Enhanced Disruption Detection Agent - Real-time Monitor</h3>
+            <div className="p-3 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">Enhanced Disruption Detection Agent - Real-time Monitor</h3>
               
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                 {/* ML-Based Anomaly Detection */}
                 <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-lg p-6 border">
                   <div className="flex items-center mb-4">
@@ -1702,10 +1715,10 @@ const SupplyChainDashboard = () => {
           )}
 
           {selectedTab === "risk-scoring" && (
-            <div className="p-6">
-              <h3 className="text-lg font-semibold mb-6">Sophisticated Risk Scoring Agent - Live Analysis</h3>
+            <div className="p-3 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">Sophisticated Risk Scoring Agent - Live Analysis</h3>
               
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                 {/* Comprehensive Risk Model */}
                 <div className="bg-gradient-to-br from-red-50 to-pink-50 rounded-lg p-6 border">
                   <div className="flex items-center mb-4">
@@ -1870,10 +1883,10 @@ const SupplyChainDashboard = () => {
           )}
 
           {selectedTab === "intelligent-notification" && (
-            <div className="p-6">
-              <h3 className="text-lg font-semibold mb-6">Intelligent Notification Agent - Communication Hub</h3>
+            <div className="p-3 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">Intelligent Notification Agent - Communication Hub</h3>
               
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                 {/* Tiered Communication Strategy */}
                 <div className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-lg p-6 border">
                   <div className="flex items-center mb-4">
@@ -2045,10 +2058,10 @@ const SupplyChainDashboard = () => {
           )}
 
           {selectedTab === "mitigation-recommendation" && (
-            <div className="p-6">
-              <h3 className="text-lg font-semibold mb-6">Mitigation Recommendation Agent - Optimization Engine</h3>
+            <div className="p-3 sm:p-6">
+              <h3 className="text-base sm:text-lg font-semibold mb-4 sm:mb-6">Mitigation Recommendation Agent - Optimization Engine</h3>
               
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
                 {/* Cost Optimization Engine */}
                 <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 border">
                   <div className="flex items-center mb-4">
