@@ -12,6 +12,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@vitejs/plugin-react": "^5.0.3",
     "langchain": "^0.0.200",
+    "lovable-tagger": "^1.1.9",
     "lucide-react": "^0.263.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
