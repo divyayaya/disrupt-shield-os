@@ -10,805 +10,399 @@ const llm = new ChatOpenAI({
   temperature: 0.1,
 });
 
-export class DataIngestionAgent {
+// Enhanced Data Ingestion Agent with configurable API polling schedules
+export class EnhancedDataIngestionAgent {
   constructor() {
     this.name = "data_ingestion";
-    this.externalDataSources = {
-      carrierApis: ['fedex', 'ups', 'maersk', 'cosco'],
-      marineTraffic: 'https://api.marinetraffic.com',
-      weatherApi: 'https://api.openweathermap.org',
-      newsApi: 'https://newsapi.org',
-      gdeltApi: 'https://api.gdeltproject.org'
-    };
-  }
-
-  async execute() {
-    try {
-      console.log("🔄 Starting comprehensive data ingestion...");
-      
-      // Core internal data
-      const [suppliers, orders, inventory] = await Promise.all([
-        SupabaseService.getSuppliers(),
-        SupabaseService.getOrders(),
-        this.getInventoryData()
-      ]);
-
-      // Real-time external data feeds
-      const externalData = await this.ingestExternalFeeds();
-      
-      // Normalize timestamps and map to internal SKUs
-      const normalizedData = await this.normalizeAndMapData({
-        suppliers,
-        orders,
-        inventory,
-        external: externalData
-      });
-
-      // Update knowledge base with new patterns
-      await this.updateKnowledgeBase(normalizedData);
-
-      // Store agent state
-      await SupabaseService.updateAgentState(this.name, {
-        lastIngestion: new Date().toISOString(),
-        suppliersCount: suppliers.length,
-        ordersCount: orders.length,
-        inventoryItemsCount: inventory.length,
-        externalSignals: externalData,
-        dataQuality: this.assessDataQuality(normalizedData)
-      });
-
-      return normalizedData;
-    } catch (error) {
-      console.error("Data ingestion error:", error);
-      return null;
-    }
-  }
-
-  async getInventoryData() {
-    try {
-      const { data, error } = await SupabaseService.supabase
-        .from('inventory')
-        .select('*');
-      
-      if (error) throw error;
-      return data || [];
-    } catch (error) {
-      console.error("Inventory fetch error:", error);
-      return [];
-    }
-  }
-
-  async ingestExternalFeeds() {
-    const timestamp = new Date().toISOString();
+    this.isRunning = false;
+    this.intervals = new Map();
     
-    // Simulate real-time external data sources as specified in playbook
-    const externalData = {
-      // Port congestion data (MarineTraffic simulation)
-      portCongestion: {
-        losAngeles: { congestionLevel: Math.random() * 100, delay: Math.floor(Math.random() * 10) },
-        longBeach: { congestionLevel: Math.random() * 100, delay: Math.floor(Math.random() * 8) },
-        newYork: { congestionLevel: Math.random() * 100, delay: Math.floor(Math.random() * 6) },
-        shanghai: { congestionLevel: Math.random() * 100, delay: Math.floor(Math.random() * 12) }
+    // Configurable polling schedules (in milliseconds)
+    this.pollingSchedules = {
+      // High-frequency: Critical real-time data
+      carrierTracking: {
+        interval: 5 * 60 * 1000,      // Every 5 minutes
+        apis: ['fedex', 'ups', 'dhl', 'maersk', 'cosco'],
+        priority: 'high'
       },
       
-      // Weather alerts simulation
       weatherAlerts: {
-        pacificStorm: Math.random() > 0.8,
-        atlanticHurricane: Math.random() > 0.95,
-        snowstormMidwest: Math.random() > 0.85,
-        typhoonsAsia: Math.random() > 0.9
+        interval: 15 * 60 * 1000,     // Every 15 minutes
+        apis: ['openweathermap', 'noaa'],
+        priority: 'high'
       },
       
-      // Carrier tracking data simulation
-      carrierData: {
-        fedex: { onTimePerformance: 85 + Math.random() * 15, avgDelay: Math.random() * 3 },
-        ups: { onTimePerformance: 80 + Math.random() * 20, avgDelay: Math.random() * 4 },
-        maersk: { onTimePerformance: 70 + Math.random() * 25, avgDelay: Math.random() * 8 },
-        cosco: { onTimePerformance: 65 + Math.random() * 30, avgDelay: Math.random() * 10 }
+      portCongestion: {
+        interval: 30 * 60 * 1000,     // Every 30 minutes
+        apis: ['marinetraffic'],
+        priority: 'high'
       },
       
-      // Geopolitical risk indicators (GDELT simulation)
-      geopoliticalRisk: {
-        chinaUSTradeStress: Math.random() * 100,
-        europeEnergyRisk: Math.random() * 100,
-        middleEastTension: Math.random() * 100,
-        globalSupplyChainRisk: Math.random() * 100
+      // Medium-frequency: Important operational data
+      supplierEDI: {
+        interval: 60 * 60 * 1000,     // Every 1 hour
+        apis: ['supplier_portals', 'edi_feeds'],
+        priority: 'medium'
       },
       
-      // News sentiment analysis simulation
+      internalERP: {
+        interval: 30 * 60 * 1000,     // Every 30 minutes
+        apis: ['erp_system', 'wms_system', 'tms_system'],
+        priority: 'medium'
+      },
+      
+      customsDelays: {
+        interval: 2 * 60 * 60 * 1000, // Every 2 hours
+        apis: ['customs_api'],
+        priority: 'medium'
+      },
+      
+      // Lower-frequency: Background intelligence
       newsSentiment: {
-        supplyChainSentiment: -1 + Math.random() * 2, // -1 to 1 scale
-        economicOutlook: -1 + Math.random() * 2,
-        tradeWarConcerns: Math.random() * 100
+        interval: 4 * 60 * 60 * 1000, // Every 4 hours
+        apis: ['newsapi', 'reuters'],
+        priority: 'low'
       },
       
-      // Social media signals simulation
-      socialSignals: {
-        supplierMentions: Math.floor(Math.random() * 1000),
-        negativeSupplierSentiment: Math.random() * 100,
-        customerComplaintTrend: Math.random() * 100
+      geopoliticalAlerts: {
+        interval: 6 * 60 * 60 * 1000, // Every 6 hours
+        apis: ['gdelt'],
+        priority: 'low'
       },
       
-      timestamp
-    };
-
-    return externalData;
-  }
-
-  async normalizeAndMapData(rawData) {
-    // Normalize disparate timestamps to UTC
-    const baseTimestamp = new Date().toISOString();
-    
-    // Map external signals to internal orders and SKUs
-    const mappedData = {
-      ...rawData,
-      normalizedTimestamp: baseTimestamp,
-      orderRiskMappings: await this.mapExternalRisksToOrders(rawData.orders, rawData.external),
-      supplierHealthScores: await this.calculateSupplierHealthScores(rawData.suppliers, rawData.external),
-      inventoryAtRisk: await this.identifyInventoryAtRisk(rawData.inventory, rawData.external)
-    };
-
-    return mappedData;
-  }
-
-  async mapExternalRisksToOrders(orders, externalData) {
-    const mappings = [];
-    
-    for (const order of orders) {
-      const riskFactors = [];
-      
-      // Map port congestion to orders by supplier location
-      if (order.supplier?.location && externalData.portCongestion) {
-        const nearbyPort = this.findNearbyPort(order.supplier.location);
-        if (nearbyPort && externalData.portCongestion[nearbyPort]) {
-          riskFactors.push({
-            type: 'port_congestion',
-            severity: externalData.portCongestion[nearbyPort].congestionLevel,
-            estimatedDelay: externalData.portCongestion[nearbyPort].delay
-          });
-        }
+      socialMediaSignals: {
+        interval: 2 * 60 * 60 * 1000, // Every 2 hours
+        apis: ['twitter_api'],
+        priority: 'low'
       }
-      
-      // Map carrier performance to orders
-      const carrierRisk = externalData.carrierData?.fedex; // Default carrier mapping
-      if (carrierRisk && carrierRisk.onTimePerformance < 80) {
-        riskFactors.push({
-          type: 'carrier_delay',
-          severity: 100 - carrierRisk.onTimePerformance,
-          estimatedDelay: carrierRisk.avgDelay
-        });
-      }
-      
-      mappings.push({
-        orderId: order.id,
-        orderNumber: order.order_number,
-        riskFactors,
-        totalRiskScore: riskFactors.reduce((sum, factor) => sum + factor.severity, 0)
-      });
-    }
-    
-    return mappings;
-  }
-
-  async calculateSupplierHealthScores(suppliers, externalData) {
-    const healthScores = [];
-    
-    for (const supplier of suppliers) {
-      let healthScore = 100; // Start with perfect score
-      
-      // Adjust based on geopolitical risk
-      if (supplier.country && externalData.geopoliticalRisk) {
-        if (supplier.country === 'China' && externalData.geopoliticalRisk.chinaUSTradeStress > 70) {
-          healthScore -= 20;
-        }
-        if (supplier.country === 'Europe' && externalData.geopoliticalRisk.europeEnergyRisk > 80) {
-          healthScore -= 15;
-        }
-      }
-      
-      // Adjust based on weather patterns
-      if (externalData.weatherAlerts.pacificStorm && supplier.region === 'Pacific') {
-        healthScore -= 10;
-      }
-      
-      // Adjust based on social sentiment
-      if (externalData.socialSignals.negativeSupplierSentiment > 70) {
-        healthScore -= 5;
-      }
-      
-      healthScores.push({
-        supplierId: supplier.id,
-        supplierName: supplier.name,
-        healthScore: Math.max(0, healthScore),
-        lastUpdated: new Date().toISOString()
-      });
-    }
-    
-    return healthScores;
-  }
-
-  async identifyInventoryAtRisk(inventory, externalData) {
-    const atRiskItems = [];
-    
-    for (const item of inventory) {
-      const riskFactors = [];
-      
-      // Check if current stock is below reorder point
-      if (item.current_stock <= item.reorder_point) {
-        riskFactors.push('low_stock');
-      }
-      
-      // Check if supplier regions are affected by external factors
-      if (externalData.weatherAlerts.pacificStorm) {
-        riskFactors.push('supplier_weather_risk');
-      }
-      
-      if (riskFactors.length > 0) {
-        atRiskItems.push({
-          sku: item.sku,
-          currentStock: item.current_stock,
-          reorderPoint: item.reorder_point,
-          riskFactors,
-          urgency: riskFactors.includes('low_stock') ? 'high' : 'medium'
-        });
-      }
-    }
-    
-    return atRiskItems;
-  }
-
-  findNearbyPort(location) {
-    const portMappings = {
-      'California': 'losAngeles',
-      'West Coast': 'losAngeles',
-      'East Coast': 'newYork',
-      'Asia': 'shanghai',
-      'China': 'shanghai'
     };
     
-    return portMappings[location] || null;
+    // Rate limiting and error handling
+    this.rateLimits = new Map();
+    this.errorCounts = new Map();
+    this.maxRetries = 3;
+    this.backoffMultiplier = 2;
   }
 
-  async updateKnowledgeBase(normalizedData) {
-    try {
-      // Extract patterns for knowledge base updates
-      const patterns = {
-        disruptionPatterns: this.extractDisruptionPatterns(normalizedData),
-        supplierPerformance: this.extractSupplierPatterns(normalizedData),
-        seasonalTrends: this.extractSeasonalPatterns(normalizedData)
+  async startContinuousIngestion() {
+    if (this.isRunning) {
+      console.log("🔄 Data ingestion already running");
+      return;
+    }
+
+    console.log("🚀 Starting continuous data ingestion with optimized polling schedules...");
+    this.isRunning = true;
+
+    // Start each data source with its specific polling schedule
+    for (const [sourceName, config] of Object.entries(this.pollingSchedules)) {
+      this.scheduleDataSource(sourceName, config);
+    }
+
+    // Start immediate initial ingestion
+    await this.executeFullIngestion();
+  }
+
+  scheduleDataSource(sourceName, config) {
+    console.log(`📅 Scheduling ${sourceName} polling every ${config.interval / 1000 / 60} minutes`);
+    
+    const intervalId = setInterval(async () => {
+      if (!this.isRunning) return;
+      
+      try {
+        await this.ingestFromSource(sourceName, config);
+      } catch (error) {
+        console.error(`❌ Error ingesting from ${sourceName}:`, error);
+        await this.handleIngestionError(sourceName, error);
+      }
+    }, config.interval);
+
+    this.intervals.set(sourceName, intervalId);
+  }
+
+  async ingestFromSource(sourceName, config) {
+    // Check rate limits
+    if (this.isRateLimited(sourceName)) {
+      console.log(`⏳ Rate limited for ${sourceName}, skipping this cycle`);
+      return;
+    }
+
+    console.log(`🔍 Ingesting from ${sourceName} (Priority: ${config.priority})`);
+    
+    const startTime = Date.now();
+    let data = {};
+
+    switch (sourceName) {
+      case 'carrierTracking':
+        data = await this.fetchCarrierData(config.apis);
+        break;
+        
+      case 'weatherAlerts':
+        data = await this.fetchWeatherData(config.apis);
+        break;
+        
+      case 'portCongestion':
+        data = await this.fetchPortData(config.apis);
+        break;
+        
+      case 'supplierEDI':
+        data = await this.fetchSupplierData(config.apis);
+        break;
+        
+      case 'internalERP':
+        data = await this.fetchInternalData(config.apis);
+        break;
+        
+      case 'customsDelays':
+        data = await this.fetchCustomsData(config.apis);
+        break;
+        
+      case 'newsSentiment':
+        data = await this.fetchNewsData(config.apis);
+        break;
+        
+      case 'geopoliticalAlerts':
+        data = await this.fetchGeopoliticalData(config.apis);
+        break;
+        
+      case 'socialMediaSignals':
+        data = await this.fetchSocialMediaData(config.apis);
+        break;
+    }
+
+    // Update rate limiting
+    this.updateRateLimit(sourceName);
+    
+    // Clear error count on successful ingestion
+    this.errorCounts.set(sourceName, 0);
+
+    // Process and store the data
+    await this.processAndStoreData(sourceName, data, config.priority);
+    
+    const duration = Date.now() - startTime;
+    console.log(`✅ ${sourceName} ingestion completed in ${duration}ms`);
+    
+    // Update agent state with source-specific metrics
+    await this.updateSourceMetrics(sourceName, data, duration);
+  }
+
+  async fetchCarrierData(apis) {
+    // Mock implementation - replace with actual API calls
+    const carrierData = {};
+    
+    for (const carrier of apis) {
+      try {
+        // Actual API call would go here
+        // const response = await fetch(`https://api.${carrier}.com/tracking`, {
+        //   headers: { 'Authorization': `Bearer ${process.env[`${carrier.toUpperCase()}_API_KEY`]}` }
+        // });
+        
+        // Mock data for demonstration
+        carrierData[carrier] = {
+          trackingUpdates: Math.floor(Math.random() * 100) + 50,
+          avgDelay: Math.random() * 2,
+          serviceDisruptions: Math.floor(Math.random() * 5),
+          timestamp: new Date().toISOString()
+        };
+      } catch (error) {
+        console.error(`Failed to fetch data from ${carrier}:`, error);
+        carrierData[carrier] = { error: error.message };
+      }
+    }
+    
+    return carrierData;
+  }
+
+  async fetchWeatherData(apis) {
+    // Mock weather data - replace with actual API calls
+    return {
+      activeAlerts: Math.floor(Math.random() * 20),
+      severity: ['low', 'medium', 'high'][Math.floor(Math.random() * 3)],
+      affectedRegions: ['US-West', 'EU-North', 'ASIA-Southeast'].slice(0, Math.floor(Math.random() * 3) + 1),
+      forecast: {
+        storms: Math.random() > 0.7,
+        hurricanes: Math.random() > 0.95,
+        snow: Math.random() > 0.8
+      },
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  async fetchPortData(apis) {
+    // Mock port congestion data
+    const ports = ['Los Angeles', 'Long Beach', 'New York', 'Savannah', 'Rotterdam', 'Shanghai'];
+    const portData = {};
+    
+    ports.forEach(port => {
+      portData[port] = {
+        congestionLevel: Math.floor(Math.random() * 100),
+        waitTime: Math.floor(Math.random() * 48), // hours
+        vesselBacklog: Math.floor(Math.random() * 50),
+        timestamp: new Date().toISOString()
       };
+    });
+    
+    return { ports: portData };
+  }
 
-      // Update knowledge base with new patterns
-      for (const [category, patternData] of Object.entries(patterns)) {
-        await this.storeKnowledgePattern(category, patternData);
-      }
-    } catch (error) {
-      console.error("Knowledge base update error:", error);
+  async processAndStoreData(sourceName, data, priority) {
+    // Normalize the data
+    const normalizedData = this.normalizeSourceData(sourceName, data, priority);
+    
+    // Store in knowledge base for RAG
+    await this.storeInKnowledgeBase(sourceName, normalizedData);
+    
+    // Update real-time metrics
+    await this.updateRealTimeMetrics(sourceName, normalizedData);
+    
+    // Trigger downstream processing for high-priority data
+    if (priority === 'high') {
+      await this.triggerDownstreamProcessing(sourceName, normalizedData);
     }
   }
 
-  extractDisruptionPatterns(data) {
+  normalizeSourceData(sourceName, data, priority) {
     return {
-      portCongestionImpact: data.external.portCongestion,
-      weatherDisruptionCor: data.external.weatherAlerts,
-      carrierPerformanceTrends: data.external.carrierData,
-      timestamp: new Date().toISOString()
+      source: sourceName,
+      priority,
+      timestamp: new Date().toISOString(),
+      dataHash: this.generateDataHash(data),
+      processedData: data,
+      metadata: {
+        ingestionTime: new Date().toISOString(),
+        dataSize: JSON.stringify(data).length,
+        recordCount: this.getRecordCount(data)
+      }
     };
   }
 
-  extractSupplierPatterns(data) {
-    return {
-      healthScoreDistribution: data.supplierHealthScores,
-      geopoliticalRiskCorrelation: data.external.geopoliticalRisk,
-      timestamp: new Date().toISOString()
-    };
-  }
-
-  extractSeasonalPatterns(data) {
-    const month = new Date().getMonth();
-    return {
-      month,
-      inventoryRiskPatterns: data.inventoryAtRisk,
-      externalFactorCorrelation: data.external,
-      timestamp: new Date().toISOString()
-    };
-  }
-
-  async storeKnowledgePattern(category, patternData) {
+  async storeInKnowledgeBase(sourceName, normalizedData) {
     try {
-      const { error } = await SupabaseService.supabase
+      await SupabaseService.supabase
         .from('knowledge_base')
-        .upsert({
-          category: `real_time_${category}`,
-          title: `Real-time ${category} pattern - ${new Date().toLocaleDateString()}`,
-          content: JSON.stringify(patternData),
+        .insert({
+          category: `realtime_${sourceName}`,
+          title: `${sourceName} data - ${new Date().toLocaleString()}`,
+          content: JSON.stringify(normalizedData.processedData),
           metadata: {
             source: 'data_ingestion_agent',
-            timestamp: new Date().toISOString(),
-            pattern_type: category
+            priority: normalizedData.priority,
+            ingestion_time: normalizedData.timestamp,
+            data_hash: normalizedData.dataHash
           },
-          keywords: this.generateKeywords(category, patternData)
+          keywords: this.generateSourceKeywords(sourceName, normalizedData.processedData)
         });
-
-      if (error) throw error;
     } catch (error) {
-      console.error(`Failed to store ${category} pattern:`, error);
+      console.error(`Failed to store ${sourceName} data in knowledge base:`, error);
     }
   }
 
-  generateKeywords(category, patternData) {
-    const baseKeywords = [category, 'real-time', 'pattern', 'disruption'];
+  async handleIngestionError(sourceName, error) {
+    const errorCount = (this.errorCounts.get(sourceName) || 0) + 1;
+    this.errorCounts.set(sourceName, errorCount);
+
+    console.error(`❌ ${sourceName} ingestion failed (attempt ${errorCount}/${this.maxRetries}):`, error.message);
+
+    if (errorCount >= this.maxRetries) {
+      // Implement exponential backoff
+      const backoffDelay = Math.pow(this.backoffMultiplier, errorCount) * 60000; // Base 1 minute
+      console.log(`⏰ Implementing backoff for ${sourceName}: ${backoffDelay / 1000} seconds`);
+      
+      setTimeout(() => {
+        this.errorCounts.set(sourceName, 0); // Reset after backoff
+      }, backoffDelay);
+    }
+
+    // Log error to monitoring system
+    await this.logIngestionError(sourceName, error, errorCount);
+  }
+
+  isRateLimited(sourceName) {
+    const lastCall = this.rateLimits.get(sourceName);
+    if (!lastCall) return false;
     
-    if (category.includes('port')) {
-      baseKeywords.push('port', 'congestion', 'shipping', 'maritime');
+    // Simple rate limiting: minimum 1 second between calls
+    return (Date.now() - lastCall) < 1000;
+  }
+
+  updateRateLimit(sourceName) {
+    this.rateLimits.set(sourceName, Date.now());
+  }
+
+  async stopContinuousIngestion() {
+    console.log("🛑 Stopping continuous data ingestion...");
+    this.isRunning = false;
+    
+    // Clear all intervals
+    for (const [sourceName, intervalId] of this.intervals.entries()) {
+      clearInterval(intervalId);
+      console.log(`🔽 Stopped polling for ${sourceName}`);
     }
-    if (category.includes('weather')) {
-      baseKeywords.push('weather', 'storm', 'delay', 'natural');
+    
+    this.intervals.clear();
+    
+    // Final state update
+    await SupabaseService.updateAgentState(this.name, {
+      status: 'stopped',
+      lastExecution: new Date().toISOString(),
+      totalSources: Object.keys(this.pollingSchedules).length
+    });
+  }
+
+  // Utility methods
+  generateDataHash(data) {
+    return btoa(JSON.stringify(data)).slice(0, 16);
+  }
+
+  getRecordCount(data) {
+    if (Array.isArray(data)) return data.length;
+    if (typeof data === 'object' && data !== null) {
+      return Object.keys(data).length;
     }
-    if (category.includes('supplier')) {
-      baseKeywords.push('supplier', 'performance', 'reliability', 'health');
+    return 1;
+  }
+
+  generateSourceKeywords(sourceName, data) {
+    const baseKeywords = [sourceName, 'real-time', 'api-data'];
+    
+    // Add source-specific keywords
+    switch (sourceName) {
+      case 'carrierTracking':
+        baseKeywords.push('tracking', 'shipping', 'logistics', 'delivery');
+        break;
+      case 'weatherAlerts':
+        baseKeywords.push('weather', 'storm', 'climate', 'forecast');
+        break;
+      case 'portCongestion':
+        baseKeywords.push('port', 'congestion', 'maritime', 'vessel');
+        break;
     }
     
     return baseKeywords;
   }
 
-  assessDataQuality(normalizedData) {
-    const quality = {
-      completeness: 0,
-      freshness: 0,
-      accuracy: 0,
-      overall: 0
-    };
-
-    // Assess completeness
-    const expectedFields = ['suppliers', 'orders', 'inventory', 'external'];
-    const presentFields = expectedFields.filter(field => normalizedData[field]);
-    quality.completeness = (presentFields.length / expectedFields.length) * 100;
-
-    // Assess freshness (data should be < 5 minutes old)
-    const dataAge = Date.now() - new Date(normalizedData.normalizedTimestamp).getTime();
-    quality.freshness = Math.max(0, 100 - (dataAge / (5 * 60 * 1000)) * 100);
-
-    // Assess accuracy (based on external data consistency)
-    quality.accuracy = normalizedData.external ? 90 : 50;
-
-    // Calculate overall quality
-    quality.overall = (quality.completeness + quality.freshness + quality.accuracy) / 3;
-
-    return quality;
-  }
-}
-
-export class DisruptionDetectionAgent {
-  constructor() {
-    this.name = "disruption_detection";
-    this.anomalyThresholds = {
-      leadTimeZScore: 2.0,
-      supplierDelaySpike: 0.2, // 20% week-over-week increase
-      portCongestionThreshold: 80,
-      weatherSeverityThreshold: 0.7
-    };
-    
-    this.prompt = new PromptTemplate({
-      template: `
-You are an advanced supply chain disruption detection AI using ML-based anomaly detection and predictive analytics.
-
-Current Data Analysis:
-Supplier Performance: {supplierData}
-External Risk Signals: {externalSignals}
-Historical Patterns: {historicalContext}
-Real-time Indicators: {realtimeIndicators}
-Anomaly Detection Results: {anomalyResults}
-
-Using the playbook methodology:
-1. Apply z-score analysis on lead-time time-series
-2. Use EWMA (Exponentially Weighted Moving Average) for trend detection
-3. Correlate external signals with historical disruption patterns
-4. Generate ETA variance forecasts using pattern recognition
-
-Decision Rules:
-- If predicted delay > SLA threshold for any order → mark as "high-risk"
-- If supplier's average delay spikes by >20% week-over-week → issue supplier-level alert
-- If port congestion > 80% → flag maritime shipping disruptions
-- If weather severity > 70% → activate weather-related delay protocols
-
-Return a JSON array of disruptions with enhanced fields:
-{
-  "type": "disruption_type",
-  "severity": "low/medium/high/critical", 
-  "confidence": 0.95,
-  "predictedImpact": 7,
-  "description": "detailed description",
-  "location": "specific location",
-  "etaVariance": "expected delay in days",
-  "affectedSuppliers": ["supplier_ids"],
-  "affectedOrders": ["order_numbers"],
-  "mitigationOptions": ["option1", "option2"],
-  "alertLevel": "supplier/order/system"
-}
-
-Response:`,
-      inputVariables: ["supplierData", "externalSignals", "historicalContext", "realtimeIndicators", "anomalyResults"],
-    });
-  }
-
-  async execute(data) {
-    try {
-      console.log("🔍 Starting advanced disruption detection...");
+  // Configuration methods
+  updatePollingFrequency(sourceName, newInterval) {
+    if (this.pollingSchedules[sourceName]) {
+      this.pollingSchedules[sourceName].interval = newInterval;
       
-      // Perform ML-based anomaly detection
-      const anomalyResults = await this.performAnomalyDetection(data);
+      if (this.isRunning && this.intervals.has(sourceName)) {
+        // Restart the specific source with new frequency
+        clearInterval(this.intervals.get(sourceName));
+        this.scheduleDataSource(sourceName, this.pollingSchedules[sourceName]);
+      }
       
-      // Get relevant historical patterns using enhanced RAG
-      const historicalContext = await RAGService.getDisruptionPatterns(
-        "port congestion weather geopolitical supplier delay"
-      );
-
-      // Generate real-time indicators
-      const realtimeIndicators = this.generateRealtimeIndicators(data);
-
-      const chain = new LLMChain({ llm, prompt: this.prompt });
-
-      const result = await chain.call({
-        supplierData: JSON.stringify(data.supplierHealthScores?.slice(0, 5) || []),
-        externalSignals: JSON.stringify(data.external),
-        historicalContext: JSON.stringify(historicalContext.slice(0, 3)),
-        realtimeIndicators: JSON.stringify(realtimeIndicators),
-        anomalyResults: JSON.stringify(anomalyResults)
-      });
-
-      let disruptions = [];
-      try {
-        disruptions = JSON.parse(result.text);
-      } catch {
-        console.log("Falling back to enhanced rule-based detection");
-        disruptions = this.enhancedRuleBasedDetection(data, anomalyResults);
-      }
-
-      // Store disruptions with enhanced metadata
-      for (const disruption of disruptions) {
-        await SupabaseService.createDisruption({
-          type: disruption.type,
-          severity: disruption.severity,
-          predicted_impact: disruption.predictedImpact,
-          confidence: disruption.confidence,
-          location: disruption.location || "Unknown",
-          metadata: {
-            etaVariance: disruption.etaVariance,
-            affectedSuppliers: disruption.affectedSuppliers,
-            affectedOrders: disruption.affectedOrders,
-            mitigationOptions: disruption.mitigationOptions,
-            alertLevel: disruption.alertLevel,
-            detectionMethod: 'ml_enhanced'
-          }
-        });
-      }
-
-      // Update knowledge base with new disruption patterns
-      await this.updateDisruptionKnowledge(disruptions, data);
-
-      await SupabaseService.updateAgentState(this.name, {
-        lastExecution: new Date().toISOString(),
-        disruptionsDetected: disruptions.length,
-        anomaliesDetected: anomalyResults.anomalies.length,
-        highRiskSuppliers: anomalyResults.supplierRisks.filter(s => s.riskLevel === 'high').length
-      });
-
-      return disruptions;
-    } catch (error) {
-      console.error("Disruption detection error:", error);
-      return this.enhancedRuleBasedDetection(data, { anomalies: [], supplierRisks: [] });
+      console.log(`📅 Updated ${sourceName} polling frequency to ${newInterval / 1000 / 60} minutes`);
     }
   }
 
-  async performAnomalyDetection(data) {
-    const anomalies = [];
-    const supplierRisks = [];
-
-    // Z-score analysis on lead times (simulated)
-    if (data.orders) {
-      for (const order of data.orders) {
-        const leadTimeZScore = this.calculateLeadTimeZScore(order);
-        if (Math.abs(leadTimeZScore) > this.anomalyThresholds.leadTimeZScore) {
-          anomalies.push({
-            type: 'lead_time_anomaly',
-            orderId: order.id,
-            zScore: leadTimeZScore,
-            severity: Math.abs(leadTimeZScore) > 3 ? 'high' : 'medium'
-          });
-        }
-      }
-    }
-
-    // Supplier delay spike detection
-    if (data.supplierHealthScores) {
-      for (const supplier of data.supplierHealthScores) {
-        const delaySpike = this.detectSupplierDelaySpike(supplier);
-        if (delaySpike > this.anomalyThresholds.supplierDelaySpike) {
-          supplierRisks.push({
-            supplierId: supplier.supplierId,
-            supplierName: supplier.supplierName,
-            delaySpike,
-            riskLevel: delaySpike > 0.5 ? 'high' : 'medium'
-          });
-        }
-      }
-    }
-
-    return { anomalies, supplierRisks };
-  }
-
-  calculateLeadTimeZScore(order) {
-    // Simulated z-score calculation
-    // In real implementation, this would use historical lead time data
-    const meanLeadTime = 14; // days
-    const stdDevLeadTime = 3; // days
-    const currentLeadTime = order.expected_delivery ? 
-      Math.ceil((new Date(order.expected_delivery) - new Date(order.created_at)) / (1000 * 60 * 60 * 24)) : 
-      meanLeadTime;
-    
-    return (currentLeadTime - meanLeadTime) / stdDevLeadTime;
-  }
-
-  detectSupplierDelaySpike(supplier) {
-    // Simulated week-over-week delay spike detection
-    // In real implementation, this would analyze historical performance data
-    const baselinePerformance = 85; // percentage
-    const currentPerformance = supplier.healthScore;
-    
-    return Math.max(0, (baselinePerformance - currentPerformance) / baselinePerformance);
-  }
-
-  generateRealtimeIndicators(data) {
+  getPollingStatus() {
     return {
-      portCongestionAlerts: this.analyzePortCongestion(data.external?.portCongestion),
-      weatherImpactScore: this.calculateWeatherImpact(data.external?.weatherAlerts),
-      carrierPerformanceAlerts: this.analyzeCarrierPerformance(data.external?.carrierData),
-      geopoliticalRiskScore: this.calculateGeopoliticalRisk(data.external?.geopoliticalRisk),
-      socialSentimentAlert: this.analyzeSocialSentiment(data.external?.socialSignals)
+      isRunning: this.isRunning,
+      activeSources: Array.from(this.intervals.keys()),
+      schedules: this.pollingSchedules,
+      errorCounts: Object.fromEntries(this.errorCounts),
+      rateLimits: Object.fromEntries(this.rateLimits)
     };
-  }
-
-  analyzePortCongestion(portCongestion) {
-    if (!portCongestion) return { alerts: [], riskLevel: 'low' };
-    
-    const alerts = [];
-    let maxRiskLevel = 'low';
-    
-    for (const [port, data] of Object.entries(portCongestion)) {
-      if (data.congestionLevel > this.anomalyThresholds.portCongestionThreshold) {
-        alerts.push({
-          port,
-          congestionLevel: data.congestionLevel,
-          expectedDelay: data.delay,
-          severity: data.congestionLevel > 90 ? 'critical' : 'high'
-        });
-        maxRiskLevel = data.congestionLevel > 90 ? 'critical' : 'high';
-      }
-    }
-    
-    return { alerts, riskLevel: maxRiskLevel };
-  }
-
-  calculateWeatherImpact(weatherAlerts) {
-    if (!weatherAlerts) return { score: 0, alerts: [] };
-    
-    const activeAlerts = Object.entries(weatherAlerts)
-      .filter(([_, active]) => active)
-      .map(([alertType, _]) => alertType);
-    
-    const impactScore = activeAlerts.length * 25; // 25 points per active alert
-    
-    return {
-      score: Math.min(impactScore, 100),
-      alerts: activeAlerts,
-      severity: impactScore > 75 ? 'high' : impactScore > 50 ? 'medium' : 'low'
-    };
-  }
-
-  analyzeCarrierPerformance(carrierData) {
-    if (!carrierData) return { alerts: [], avgPerformance: 100 };
-    
-    const alerts = [];
-    let totalPerformance = 0;
-    let carrierCount = 0;
-    
-    for (const [carrier, data] of Object.entries(carrierData)) {
-      totalPerformance += data.onTimePerformance;
-      carrierCount++;
-      
-      if (data.onTimePerformance < 80) {
-        alerts.push({
-          carrier,
-          onTimePerformance: data.onTimePerformance,
-          avgDelay: data.avgDelay,
-          severity: data.onTimePerformance < 70 ? 'high' : 'medium'
-        });
-      }
-    }
-    
-    return {
-      alerts,
-      avgPerformance: carrierCount > 0 ? totalPerformance / carrierCount : 100
-    };
-  }
-
-  calculateGeopoliticalRisk(geopoliticalRisk) {
-    if (!geopoliticalRisk) return { score: 0, highRiskAreas: [] };
-    
-    const highRiskAreas = Object.entries(geopoliticalRisk)
-      .filter(([_, risk]) => risk > 70)
-      .map(([area, risk]) => ({ area, risk }));
-    
-    const avgRisk = Object.values(geopoliticalRisk).reduce((sum, risk) => sum + risk, 0) / Object.keys(geopoliticalRisk).length;
-    
-    return {
-      score: avgRisk,
-      highRiskAreas,
-      severity: avgRisk > 80 ? 'high' : avgRisk > 60 ? 'medium' : 'low'
-    };
-  }
-
-  analyzeSocialSentiment(socialSignals) {
-    if (!socialSignals) return { alert: false, sentiment: 'neutral' };
-    
-    const negativeSentiment = socialSignals.negativeSupplierSentiment || 0;
-    const complaintTrend = socialSignals.customerComplaintTrend || 0;
-    
-    const overallNegativeSentiment = (negativeSentiment + complaintTrend) / 2;
-    
-    return {
-      alert: overallNegativeSentiment > 70,
-      sentiment: overallNegativeSentiment > 70 ? 'negative' : overallNegativeSentiment < 30 ? 'positive' : 'neutral',
-      score: overallNegativeSentiment,
-      mentions: socialSignals.supplierMentions || 0
-    };
-  }
-
-  enhancedRuleBasedDetection(data, anomalyResults) {
-    const disruptions = [];
-
-    // Port congestion disruptions
-    if (data.external?.portCongestion) {
-      for (const [port, congestionData] of Object.entries(data.external.portCongestion)) {
-        if (congestionData.congestionLevel > this.anomalyThresholds.portCongestionThreshold) {
-          disruptions.push({
-            type: "port_congestion",
-            severity: congestionData.congestionLevel > 90 ? "critical" : "high",
-            confidence: 0.95,
-            predictedImpact: congestionData.delay,
-            description: `Severe congestion at ${port} port`,
-            location: port,
-            etaVariance: congestionData.delay,
-            affectedSuppliers: [],
-            affectedOrders: [],
-            mitigationOptions: ["air_freight", "alternate_port", "delay_notification"],
-            alertLevel: "system"
-          });
-        }
-      }
-    }
-
-    // Weather-related disruptions
-    if (data.external?.weatherAlerts) {
-      const activeWeatherAlerts = Object.entries(data.external.weatherAlerts)
-        .filter(([_, active]) => active);
-      
-      for (const [alertType, _] of activeWeatherAlerts) {
-        disruptions.push({
-          type: "weather_delay",
-          severity: "medium",
-          confidence: 0.85,
-          predictedImpact: 3,
-          description: `Weather disruption: ${alertType}`,
-          location: "Multiple regions",
-          etaVariance: 3,
-          affectedSuppliers: [],
-          affectedOrders: [],
-          mitigationOptions: ["delay_notification", "route_change", "inventory_buffer"],
-          alertLevel: "system"
-        });
-      }
-    }
-
-    // Carrier performance disruptions
-    if (data.external?.carrierData) {
-      for (const [carrier, performanceData] of Object.entries(data.external.carrierData)) {
-        if (performanceData.onTimePerformance < 80) {
-          disruptions.push({
-            type: "carrier_delay",
-            severity: performanceData.onTimePerformance < 70 ? "high" : "medium",
-            confidence: 0.8,
-            predictedImpact: performanceData.avgDelay,
-            description: `${carrier} performance below threshold`,
-            location: "Multiple routes",
-            etaVariance: performanceData.avgDelay,
-            affectedSuppliers: [],
-            affectedOrders: [],
-            mitigationOptions: ["alternate_carrier", "expedited_shipping", "customer_notification"],
-            alertLevel: "order"
-          });
-        }
-      }
-    }
-
-    // Anomaly-based disruptions
-    for (const anomaly of anomalyResults.anomalies || []) {
-      disruptions.push({
-        type: anomaly.type,
-        severity: anomaly.severity,
-        confidence: 0.9,
-        predictedImpact: 5,
-        description: `Lead time anomaly detected for order ${anomaly.orderId}`,
-        location: "Unknown",
-        etaVariance: 5,
-        affectedSuppliers: [],
-        affectedOrders: [anomaly.orderId],
-        mitigationOptions: ["expedited_shipping", "customer_notification"],
-        alertLevel: "order"
-      });
-    }
-
-    return disruptions;
-  }
-
-  async updateDisruptionKnowledge(disruptions, data) {
-    try {
-      for (const disruption of disruptions) {
-        const knowledgeEntry = {
-          category: 'disruption_patterns',
-          title: `${disruption.type} disruption pattern - ${new Date().toLocaleDateString()}`,
-          content: JSON.stringify({
-            disruptionType: disruption.type,
-            severity: disruption.severity,
-            location: disruption.location,
-            predictedImpact: disruption.predictedImpact,
-            mitigationOptions: disruption.mitigationOptions,
-            externalFactors: data.external,
-            detectionTimestamp: new Date().toISOString()
-          }),
-          metadata: {
-            source: 'disruption_detection_agent',
-            confidence: disruption.confidence,
-            alertLevel: disruption.alertLevel,
-            affectedEntities: [...(disruption.affectedSuppliers || []), ...(disruption.affectedOrders || [])]
-          },
-          keywords: this.generateDisruptionKeywords(disruption)
-        };
-
-        await SupabaseService.supabase
-          .from('knowledge_base')
-          .insert(knowledgeEntry);
-      }
-    } catch (error) {
-      console.error("Failed to update disruption knowledge:", error);
-    }
-  }
-
-  generateDisruptionKeywords(disruption) {
-    const keywords = [
-      disruption.type,
-      disruption.severity,
-      'disruption',
-      'pattern',
-      disruption.location?.toLowerCase()
-    ].filter(Boolean);
-
-    // Add specific keywords based on disruption type
-    if (disruption.type.includes('port')) {
-      keywords.push('maritime', 'shipping', 'port', 'congestion');
-    }
-    if (disruption.type.includes('weather')) {
-      keywords.push('weather', 'storm', 'natural', 'climate');
-    }
-    if (disruption.type.includes('carrier')) {
-      keywords.push('logistics', 'transportation', 'delivery', 'carrier');
-    }
-    if (disruption.type.includes('geopolitical')) {
-      keywords.push('trade', 'politics', 'international', 'policy');
-    }
-
-    return keywords;
   }
 }
 
