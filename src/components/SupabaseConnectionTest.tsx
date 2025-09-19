@@ -16,7 +16,7 @@ export const SupabaseConnectionTest: React.FC<ConnectionTestProps> = ({ onResult
         // Test basic connection
         const { data, error } = await supabase
           .from('orders')
-          .select('count(*)')
+          .select('id')
           .limit(1);
 
         if (error) {
