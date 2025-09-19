@@ -13,6 +13,9 @@ import {
   MessageSquare,
   Play,
   Square,
+  Database,
+  Activity,
+  Globe,
 } from "lucide-react";
 import { SupabaseService } from "./lib/supabase";
 import { SupplyChainWorkflow } from "./lib/langgraph";
@@ -311,6 +314,11 @@ const SupplyChainDashboard = () => {
                 id: "notifications",
                 label: "AI Notifications",
                 icon: MessageSquare,
+              },
+              {
+                id: "data-ingestion",
+                label: "Data Ingestion Agent",
+                icon: Database,
               },
             ].map(({ id, label, icon: Icon }) => (
               <button
@@ -644,6 +652,187 @@ const SupplyChainDashboard = () => {
                     AI-powered notifications.
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {selectedTab === "data-ingestion" && (
+            <div className="p-6">
+              <h3 className="text-lg font-semibold mb-6">Advanced Data Ingestion Agent</h3>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Real-time External Data Feeds */}
+                <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <Globe className="h-6 w-6 text-blue-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Real-time External Data Feeds</h4>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm">
+                      <div className="flex items-center">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                        <span className="font-medium">MarineTraffic API</span>
+                      </div>
+                      <span className="text-sm text-gray-600">Port Congestion Data</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm">
+                      <div className="flex items-center">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                        <span className="font-medium">Weather Alerts</span>
+                      </div>
+                      <span className="text-sm text-gray-600">Storm Tracking</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm">
+                      <div className="flex items-center">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                        <span className="font-medium">Carrier APIs</span>
+                      </div>
+                      <span className="text-sm text-gray-600">FedEx, UPS, Maersk</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm">
+                      <div className="flex items-center">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                        <span className="font-medium">GDELT Project</span>
+                      </div>
+                      <span className="text-sm text-gray-600">Geopolitical Risk</span>
+                    </div>
+                    <div className="flex items-center justify-between p-3 bg-white rounded-lg shadow-sm">
+                      <div className="flex items-center">
+                        <div className="w-2 h-2 bg-green-500 rounded-full mr-3"></div>
+                        <span className="font-medium">News Sentiment</span>
+                      </div>
+                      <span className="text-sm text-gray-600">Market Intelligence</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Data Normalization */}
+                <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <Activity className="h-6 w-6 text-green-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Data Normalization</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Timestamp Standardization</span>
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">98.5%</span>
+                      </div>
+                      <div className="text-sm text-gray-600">UTC conversion and timezone handling</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">SKU Mapping</span>
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs rounded-full">96.2%</span>
+                      </div>
+                      <div className="text-sm text-gray-600">Cross-system product identification</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Missing Data Detection</span>
+                        <span className="px-2 py-1 bg-yellow-100 text-yellow-800 text-xs rounded-full">89.1%</span>
+                      </div>
+                      <div className="text-sm text-gray-600">Acknowledgment and validation checks</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Knowledge Base Updates */}
+                <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <Database className="h-6 w-6 text-purple-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Knowledge Base Updates</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Pattern Storage</span>
+                        <Clock className="h-4 w-4 text-gray-500" />
+                      </div>
+                      <div className="text-sm text-gray-600">Real-time behavioral pattern learning</div>
+                      <div className="text-xs text-purple-600 mt-1">Last update: 2 minutes ago</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Vector Embeddings</span>
+                        <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">1,024 dims</span>
+                      </div>
+                      <div className="text-sm text-gray-600">Semantic similarity indexing</div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-medium text-gray-900">Learning Iterations</span>
+                        <span className="px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded-full">45,231</span>
+                      </div>
+                      <div className="text-sm text-gray-600">Continuous model refinement</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Quality Assessment */}
+                <div className="bg-gradient-to-br from-orange-50 to-red-50 rounded-lg p-6 border">
+                  <div className="flex items-center mb-4">
+                    <CheckCircle className="h-6 w-6 text-orange-600 mr-3" />
+                    <h4 className="text-lg font-semibold text-gray-900">Quality Assessment</h4>
+                  </div>
+                  <div className="space-y-4">
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-medium text-gray-900">Data Completeness</span>
+                        <span className="text-lg font-bold text-green-600">94.7%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-green-500 h-2 rounded-full" style={{width: '94.7%'}}></div>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-medium text-gray-900">Data Freshness</span>
+                        <span className="text-lg font-bold text-blue-600">98.2%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-blue-500 h-2 rounded-full" style={{width: '98.2%'}}></div>
+                      </div>
+                    </div>
+                    <div className="bg-white rounded-lg p-4 shadow-sm">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="font-medium text-gray-900">Accuracy Score</span>
+                        <span className="text-lg font-bold text-purple-600">91.8%</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2">
+                        <div className="bg-purple-500 h-2 rounded-full" style={{width: '91.8%'}}></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recent Data Ingestion Activity */}
+              <div className="mt-8 bg-white rounded-lg border p-6">
+                <h4 className="text-lg font-semibold mb-4">Recent Data Ingestion Activity</h4>
+                <div className="space-y-3">
+                  {[
+                    { time: "2 min ago", source: "MarineTraffic API", event: "Port congestion data updated", status: "success" },
+                    { time: "5 min ago", source: "Weather Service", event: "Storm alert processed", status: "success" },
+                    { time: "8 min ago", source: "UPS API", event: "Delivery status synchronized", status: "success" },
+                    { time: "12 min ago", source: "GDELT", event: "Geopolitical risk assessment", status: "warning" },
+                    { time: "15 min ago", source: "News API", event: "Sentiment analysis complete", status: "success" },
+                  ].map((activity, index) => (
+                    <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div className="flex items-center">
+                        <div className={`w-2 h-2 rounded-full mr-3 ${
+                          activity.status === 'success' ? 'bg-green-500' : 
+                          activity.status === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
+                        }`}></div>
+                        <div>
+                          <div className="font-medium text-gray-900">{activity.event}</div>
+                          <div className="text-sm text-gray-600">{activity.source}</div>
+                        </div>
+                      </div>
+                      <span className="text-sm text-gray-500">{activity.time}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}
