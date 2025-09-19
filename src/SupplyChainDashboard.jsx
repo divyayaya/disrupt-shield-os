@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { SupabaseService } from "./lib/supabase";
 import { SupplyChainWorkflow } from "./lib/langgraph";
+import { SupabaseConnectionTest } from "./components/SupabaseConnectionTest";
 
 const SupplyChainDashboard = () => {
   const [workflow] = useState(() => new SupplyChainWorkflow());
@@ -32,6 +33,7 @@ const SupplyChainDashboard = () => {
   const [notifications, setNotifications] = useState([]);
   const [agentStates, setAgentStates] = useState({});
   const [workflowStatus, setWorkflowStatus] = useState({ status: "idle" });
+  const [connectionStatus, setConnectionStatus] = useState({ isConnected: false, error: null });
 
   // Real-time data fetching
   useEffect(() => {
@@ -164,6 +166,24 @@ const SupplyChainDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
+      {/* Connection Test */}
+      <SupabaseConnectionTest 
+        onResult={(isConnected, error) => setConnectionStatus({ isConnected, error })}
+      />
+      
+      {/* Connection Status Banner */}
+      {!connectionStatus.isConnected && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
+          <strong>Connection Error:</strong> {connectionStatus.error || 'Failed to connect to Supabase'}
+        </div>
+      )}
+      
+      {connectionStatus.isConnected && (
+        <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+          <strong>✓ Supabase Connected:</strong> Database connection is working properly
+        </div>
+      )}
+      
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
