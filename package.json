@@ -22,10 +22,11 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build", 
+    "build:dev": "vite build --mode development",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
-  },
+  }
   "devDependencies": {
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.24",
