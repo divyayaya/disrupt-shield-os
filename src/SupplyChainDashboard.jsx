@@ -680,203 +680,268 @@ const SupplyChainDashboard = () => {
                       <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
                         <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#e5e7eb" strokeWidth="0.5" opacity="0.3"/>
                       </pattern>
-                    </defs>
-                    <rect width="100%" height="100%" fill="url(#grid)" />
-                    
-                    {/* Connection Lines (Edges) */}
-                    {/* Data Ingestion to Disruption Detection */}
-                    <path
-                      d="M 120 80 Q 200 80 280 120"
-                      stroke="#3b82f6"
-                      strokeWidth="3"
-                      fill="none"
-                      className={`${dataIngestionMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
-                      markerEnd="url(#arrowhead)"
-                    />
-                    
-                    {/* Disruption Detection to Risk Scoring */}
-                    <path
-                      d="M 350 160 Q 430 200 500 240"
-                      stroke="#10b981"
-                      strokeWidth="3"
-                      fill="none"
-                      className={`${disruptionDetectionMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
-                      markerEnd="url(#arrowhead)"
-                    />
-                    
-                    {/* Risk Scoring to Notification */}
-                    <path
-                      d="M 570 280 Q 650 320 720 360"
-                      stroke="#f59e0b"
-                      strokeWidth="3"
-                      fill="none"
-                      className={`${riskScoringMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
-                      markerEnd="url(#arrowhead)"
-                    />
-                    
-                    {/* Risk Scoring to Mitigation */}
-                    <path
-                      d="M 570 280 Q 650 240 720 200"
-                      stroke="#8b5cf6"
-                      strokeWidth="3"
-                      fill="none"
-                      className={`${mitigationMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
-                      markerEnd="url(#arrowhead)"
-                    />
-                    
-                    {/* Arrow markers */}
-                    <defs>
                       <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
                         <polygon points="0 0, 10 3.5, 0 7" fill="#6b7280" />
                       </marker>
                     </defs>
+                    <rect width="100%" height="100%" fill="url(#grid)" />
+                    
+                    {/* Central Shared Database (LangGraph State) */}
+                    <g transform="translate(400, 250)">
+                      <circle 
+                        cx="0" 
+                        cy="0" 
+                        r="60" 
+                        fill="#f8fafc" 
+                        stroke="#475569" 
+                        strokeWidth="4"
+                        className="animate-pulse"
+                      />
+                      <circle 
+                        cx="0" 
+                        cy="0" 
+                        r="45" 
+                        fill="#e2e8f0" 
+                        stroke="#64748b" 
+                        strokeWidth="2"
+                      />
+                      <Database className="h-10 w-10 text-slate-700" x="-20" y="-20" />
+                      <text x="0" y="80" textAnchor="middle" className="text-base font-bold fill-gray-800">
+                        LangGraph State
+                      </text>
+                      <text x="0" y="95" textAnchor="middle" className="text-sm fill-gray-600">
+                        Supabase Database
+                      </text>
+                    </g>
+                    
+                    {/* Connection Lines from Agents to Central Database */}
+                    {/* Data Ingestion Agent to Database */}
+                    <path
+                      d="M 150 150 L 340 250"
+                      stroke="#3b82f6"
+                      strokeWidth="3"
+                      fill="none"
+                      className={`${dataIngestionMetrics.activity.length > 0 ? 'animate-pulse' : 'opacity-50'}`}
+                      strokeDasharray={dataIngestionMetrics.activity.length > 0 ? "0" : "5,5"}
+                      markerEnd="url(#arrowhead)"
+                    />
+                    
+                    {/* Disruption Detection Agent to Database */}
+                    <path
+                      d="M 250 100 L 360 190"
+                      stroke="#10b981"
+                      strokeWidth="3"
+                      fill="none"
+                      className={`${disruptionDetectionMetrics.activity.length > 0 ? 'animate-pulse' : 'opacity-50'}`}
+                      strokeDasharray={disruptionDetectionMetrics.activity.length > 0 ? "0" : "5,5"}
+                      markerEnd="url(#arrowhead)"
+                    />
+                    
+                    {/* Risk Scoring Agent to Database */}
+                    <path
+                      d="M 550 150 L 460 190"
+                      stroke="#f59e0b"
+                      strokeWidth="3"
+                      fill="none"
+                      className={`${riskScoringMetrics.activity.length > 0 ? 'animate-pulse' : 'opacity-50'}`}
+                      strokeDasharray={riskScoringMetrics.activity.length > 0 ? "0" : "5,5"}
+                      markerEnd="url(#arrowhead)"
+                    />
+                    
+                    {/* Notification Agent to Database */}
+                    <path
+                      d="M 650 350 L 460 310"
+                      stroke="#6366f1"
+                      strokeWidth="3"
+                      fill="none"
+                      className={`${notificationMetrics.activity.length > 0 ? 'animate-pulse' : 'opacity-50'}`}
+                      strokeDasharray={notificationMetrics.activity.length > 0 ? "0" : "5,5"}
+                      markerEnd="url(#arrowhead)"
+                    />
+                    
+                    {/* Mitigation Agent to Database */}
+                    <path
+                      d="M 650 100 L 460 190"
+                      stroke="#8b5cf6"
+                      strokeWidth="3"
+                      fill="none"
+                      className={`${mitigationMetrics.activity.length > 0 ? 'animate-pulse' : 'opacity-50'}`}
+                      strokeDasharray={mitigationMetrics.activity.length > 0 ? "0" : "5,5"}
+                      markerEnd="url(#arrowhead)"
+                    />
                     
                     {/* Agent Nodes */}
                     {/* Data Ingestion Agent */}
-                    <g transform="translate(50, 50)">
+                    <g transform="translate(100, 100)">
                       <circle 
                         cx="50" 
                         cy="50" 
-                        r="40" 
+                        r="35" 
                         fill="#dbeafe" 
                         stroke="#3b82f6" 
                         strokeWidth="3"
                         className={`${dataIngestionMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
                       />
-                      <Database className="h-8 w-8 text-blue-600" x="42" y="42" />
-                      <text x="50" y="110" textAnchor="middle" className="text-sm font-semibold fill-gray-800">
+                      <Activity className="h-7 w-7 text-blue-600" x="43" y="43" />
+                      <text x="50" y="100" textAnchor="middle" className="text-sm font-semibold fill-gray-800">
                         Data Ingestion
                       </text>
-                      <text x="50" y="125" textAnchor="middle" className="text-xs fill-gray-600">
+                      <text x="50" y="115" textAnchor="middle" className="text-xs fill-gray-600">
                         {dataIngestionMetrics.quality.freshness.toFixed(1)}% Fresh
                       </text>
                     </g>
                     
                     {/* Disruption Detection Agent */}
-                    <g transform="translate(280, 90)">
+                    <g transform="translate(200, 50)">
                       <circle 
                         cx="50" 
                         cy="50" 
-                        r="40" 
+                        r="35" 
                         fill="#dcfce7" 
                         stroke="#10b981" 
                         strokeWidth="3"
                         className={`${disruptionDetectionMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
                       />
-                      <Shield className="h-8 w-8 text-green-600" x="42" y="42" />
-                      <text x="50" y="110" textAnchor="middle" className="text-sm font-semibold fill-gray-800">
+                      <Shield className="h-7 w-7 text-green-600" x="43" y="43" />
+                      <text x="50" y="100" textAnchor="middle" className="text-sm font-semibold fill-gray-800">
                         Disruption Detection
                       </text>
-                      <text x="50" y="125" textAnchor="middle" className="text-xs fill-gray-600">
+                      <text x="50" y="115" textAnchor="middle" className="text-xs fill-gray-600">
                         {disruptionDetectionMetrics.anomalyDetection.zScoreAnalysis.alertsGenerated} Alerts
                       </text>
                     </g>
                     
                     {/* Risk Scoring Agent */}
-                    <g transform="translate(500, 210)">
+                    <g transform="translate(500, 100)">
                       <circle 
                         cx="50" 
                         cy="50" 
-                        r="40" 
+                        r="35" 
                         fill="#fef3c7" 
                         stroke="#f59e0b" 
                         strokeWidth="3"
                         className={`${riskScoringMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
                       />
-                      <Target className="h-8 w-8 text-yellow-600" x="42" y="42" />
-                      <text x="50" y="110" textAnchor="middle" className="text-sm font-semibold fill-gray-800">
+                      <Target className="h-7 w-7 text-yellow-600" x="43" y="43" />
+                      <text x="50" y="100" textAnchor="middle" className="text-sm font-semibold fill-gray-800">
                         Risk Scoring
                       </text>
-                      <text x="50" y="125" textAnchor="middle" className="text-xs fill-gray-600">
+                      <text x="50" y="115" textAnchor="middle" className="text-xs fill-gray-600">
                         Score: {riskScoringMetrics.multiFactorAnalysis.overallScore.toFixed(1)}
                       </text>
                     </g>
                     
                     {/* Notification Agent */}
-                    <g transform="translate(720, 330)">
+                    <g transform="translate(600, 300)">
                       <circle 
                         cx="50" 
                         cy="50" 
-                        r="40" 
+                        r="35" 
                         fill="#e0e7ff" 
                         stroke="#6366f1" 
                         strokeWidth="3"
                         className={`${notificationMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
                       />
-                      <Bell className="h-8 w-8 text-indigo-600" x="42" y="42" />
-                      <text x="50" y="110" textAnchor="middle" className="text-sm font-semibold fill-gray-800">
+                      <Bell className="h-7 w-7 text-indigo-600" x="43" y="43" />
+                      <text x="50" y="100" textAnchor="middle" className="text-sm font-semibold fill-gray-800">
                         Notification
                       </text>
-                      <text x="50" y="125" textAnchor="middle" className="text-xs fill-gray-600">
+                      <text x="50" y="115" textAnchor="middle" className="text-xs fill-gray-600">
                         {notificationMetrics.channelSelection.phone.sent + notificationMetrics.channelSelection.email.sent} Sent
                       </text>
                     </g>
                     
                     {/* Mitigation Recommendation Agent */}
-                    <g transform="translate(720, 170)">
+                    <g transform="translate(600, 50)">
                       <circle 
                         cx="50" 
                         cy="50" 
-                        r="40" 
+                        r="35" 
                         fill="#f3e8ff" 
                         stroke="#8b5cf6" 
                         strokeWidth="3"
                         className={`${mitigationMetrics.activity.length > 0 ? 'animate-pulse' : ''}`}
                       />
-                      <Brain className="h-8 w-8 text-purple-600" x="42" y="42" />
-                      <text x="50" y="110" textAnchor="middle" className="text-sm font-semibold fill-gray-800">
+                      <Brain className="h-7 w-7 text-purple-600" x="43" y="43" />
+                      <text x="50" y="100" textAnchor="middle" className="text-sm font-semibold fill-gray-800">
                         Mitigation
                       </text>
-                      <text x="50" y="125" textAnchor="middle" className="text-xs fill-gray-600">
-                        {mitigationMetrics.feasibilityScoring.recommendationsGenerated} Recommendations
+                      <text x="50" y="115" textAnchor="middle" className="text-xs fill-gray-600">
+                        {mitigationMetrics.feasibilityScoring.recommendationsGenerated} Recs
                       </text>
                     </g>
                     
-                    {/* Data Flow Indicators */}
+                    {/* Database Access Indicators - Only show when agents are actually reading/writing */}
                     {dataIngestionMetrics.activity.length > 0 && (
-                      <circle cx="200" cy="80" r="4" fill="#3b82f6" className="animate-ping">
-                        <animate attributeName="r" values="2;8;2" dur="2s" repeatCount="indefinite"/>
-                      </circle>
+                      <>
+                        <circle cx="245" cy="200" r="4" fill="#3b82f6" className="animate-ping">
+                          <animate attributeName="r" values="2;8;2" dur="1.5s" repeatCount="indefinite"/>
+                        </circle>
+                        <text x="245" y="185" textAnchor="middle" className="text-xs fill-blue-600 font-semibold">WRITE</text>
+                      </>
                     )}
                     
                     {disruptionDetectionMetrics.activity.length > 0 && (
-                      <circle cx="430" cy="200" r="4" fill="#10b981" className="animate-ping">
-                        <animate attributeName="r" values="2;8;2" dur="2s" repeatCount="indefinite"/>
-                      </circle>
+                      <>
+                        <circle cx="305" cy="145" r="4" fill="#10b981" className="animate-ping">
+                          <animate attributeName="r" values="2;8;2" dur="1.5s" repeatCount="indefinite"/>
+                        </circle>
+                        <text x="305" y="130" textAnchor="middle" className="text-xs fill-green-600 font-semibold">READ</text>
+                      </>
                     )}
                     
                     {riskScoringMetrics.activity.length > 0 && (
-                      <circle cx="650" cy="320" r="4" fill="#f59e0b" className="animate-ping">
-                        <animate attributeName="r" values="2;8;2" dur="2s" repeatCount="indefinite"/>
-                      </circle>
+                      <>
+                        <circle cx="495" cy="145" r="4" fill="#f59e0b" className="animate-ping">
+                          <animate attributeName="r" values="2;8;2" dur="1.5s" repeatCount="indefinite"/>
+                        </circle>
+                        <text x="495" y="130" textAnchor="middle" className="text-xs fill-yellow-600 font-semibold">UPDATE</text>
+                      </>
+                    )}
+                    
+                    {notificationMetrics.activity.length > 0 && (
+                      <>
+                        <circle cx="555" cy="280" r="4" fill="#6366f1" className="animate-ping">
+                          <animate attributeName="r" values="2;8;2" dur="1.5s" repeatCount="indefinite"/>
+                        </circle>
+                        <text x="555" y="265" textAnchor="middle" className="text-xs fill-indigo-600 font-semibold">READ</text>
+                      </>
                     )}
                     
                     {mitigationMetrics.activity.length > 0 && (
-                      <circle cx="650" cy="240" r="4" fill="#8b5cf6" className="animate-ping">
-                        <animate attributeName="r" values="2;8;2" dur="2s" repeatCount="indefinite"/>
-                      </circle>
+                      <>
+                        <circle cx="505" cy="145" r="4" fill="#8b5cf6" className="animate-ping">
+                          <animate attributeName="r" values="2;8;2" dur="1.5s" repeatCount="indefinite"/>
+                        </circle>
+                        <text x="505" y="130" textAnchor="middle" className="text-xs fill-purple-600 font-semibold">READ</text>
+                      </>
                     )}
                   </svg>
                   
                   {/* Real-time Status Legend */}
                   <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-lg p-4 shadow-lg">
-                    <h4 className="font-semibold text-sm mb-3 text-gray-800">Real-time Status</h4>
+                    <h4 className="font-semibold text-sm mb-3 text-gray-800">LangGraph Data Flow</h4>
                     <div className="space-y-2">
                       <div className="flex items-center text-xs">
-                        <div className="w-3 h-3 bg-blue-500 rounded-full mr-2 animate-pulse"></div>
-                        <span>Data Flow Active</span>
+                        <div className="w-3 h-3 bg-slate-600 rounded-full mr-2 animate-pulse"></div>
+                        <span>Shared Database State</span>
+                      </div>
+                      <div className="flex items-center text-xs">
+                        <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                        <span>DB Write Operations</span>
                       </div>
                       <div className="flex items-center text-xs">
                         <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                        <span>Agent Processing</span>
+                        <span>DB Read Operations</span>
                       </div>
                       <div className="flex items-center text-xs">
                         <div className="w-3 h-3 bg-yellow-500 rounded-full mr-2"></div>
-                        <span>Risk Analysis</span>
+                        <span>DB Update Operations</span>
                       </div>
-                      <div className="flex items-center text-xs">
-                        <div className="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
-                        <span>Recommendations</span>
+                      <div className="text-xs text-gray-500 mt-2 border-t pt-2">
+                        <div>• Agents communicate via shared state</div>
+                        <div>• No direct agent-to-agent messaging</div>
+                        <div>• Database is the coordination hub</div>
                       </div>
                     </div>
                   </div>
