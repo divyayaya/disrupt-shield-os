@@ -21,12 +21,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build", 
-    "build:dev": "vite build --mode development",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  }
+    "dev": "vite",
+    "build": "vite build",
+    "build:dev": "vite build --mode development"
+  },
   "devDependencies": {
     "autoprefixer": "^10.4.14",
     "postcss": "^8.4.24",
