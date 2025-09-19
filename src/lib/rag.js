@@ -1,67 +1,100 @@
-import { SupabaseService } from "./supabase";
+import { SupabaseService } from './supabase.js';
 
-export class RAGService {
-  static async retrieveRelevantKnowledge(category, context) {
+export class RAGSystem {
+  constructor() {
+    this.knowledgeBase = null;
+  }
+
+  async initialize() {
+    console.log('Initializing RAG system...');
     try {
-      // Use keyword-based search instead of vector similarity
-      const contextWords = context.toLowerCase().split(" ");
-
-      const { data: knowledge, error } = await SupabaseService.supabase
-        .from("knowledge_base")
-        .select("*")
-        .eq("category", category);
-
-      if (error) throw error;
-
-      return knowledge
-        .map((item) => ({
-          title: item.title,
-          content: item.content,
-          metadata: item.metadata,
-          relevanceScore: this.calculateKeywordRelevance(
-            contextWords,
-            item.keywords || []
-          ),
-        }))
-        .sort((a, b) => b.relevanceScore - a.relevanceScore);
+      this.knowledgeBase = await this.loadKnowledgeBase();
+      console.log(`RAG system initialized with ${this.knowledgeBase.length} knowledge entries`);
     } catch (error) {
-      console.error("RAG retrieval error:", error);
+      console.error('Failed to initialize RAG system:', error);
+      throw error;
+    }
+  }
+
+  async loadKnowledgeBase() {
+    const { data, error } = await SupabaseService.supabase
+      .from('knowledge_base')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw new Error(`Failed to load knowledge base: ${error.message}`);
+    }
+
+    return data || [];
+  }
+
+  async retrieveRelevantKnowledge(query, category = null, limit = 5) {
+    console.log(`Retrieving knowledge for query: "${query}"`);
+    
+    try {
+      const relevantKnowledge = await this.semanticSearch(query, category, limit);
+      
+      return relevantKnowledge.map(item => ({
+        title: item.title,
+        content: item.content,
+        category: item.category,
+        relevanceScore: item.relevanceScore || 0.8,
+        metadata: item.metadata || {}
+      }));
+      
+    } catch (error) {
+      console.error('Knowledge retrieval failed:', error);
       return [];
     }
   }
 
-  static calculateKeywordRelevance(queryWords, keywords) {
-    if (!keywords || keywords.length === 0) return 0;
+  async semanticSearch(query, category = null, limit = 5) {
+    console.log('Performing semantic search...');
+    
+    try {
+      let queryBuilder = SupabaseService.supabase
+        .from('knowledge_base')
+        .select('*');
 
-    const matches = queryWords.filter((word) =>
-      keywords.some((keyword) =>
-        keyword.toLowerCase().includes(word.toLowerCase())
-      )
-    ).length;
+      if (category) {
+        queryBuilder = queryBuilder.eq('category', category);
+      }
 
-    return matches / Math.max(queryWords.length, 1);
+      queryBuilder = queryBuilder.textSearch('content', query);
+
+      const { data, error } = await queryBuilder
+        .order('created_at', { ascending: false })
+        .limit(limit);
+
+      if (error) {
+        throw error;
+      }
+
+      return (data || []).map(item => ({
+        ...item,
+        relevanceScore: this.calculateRelevanceScore(query, item.content)
+      }));
+      
+    } catch (error) {
+      console.error('Semantic search failed:', error);
+      return [];
+    }
   }
 
-  static async getMitigationStrategies(
-    orderValue,
-    delayDays,
-    supplierReliability
-  ) {
-    const context = `order value ${orderValue} delay ${delayDays} days supplier reliability ${supplierReliability}`;
-    return await this.retrieveRelevantKnowledge("mitigation", context);
-  }
-
-  static async getCustomerPreferences(customerTier) {
-    return await this.retrieveRelevantKnowledge(
-      "customer_preferences",
-      customerTier
-    );
-  }
-
-  static async getDisruptionPatterns(disruptionType) {
-    return await this.retrieveRelevantKnowledge(
-      "disruption_patterns",
-      disruptionType
-    );
+  calculateRelevanceScore(query, content) {
+    const queryWords = query.toLowerCase().split(' ');
+    const contentWords = content.toLowerCase().split(' ');
+    
+    let matches = 0;
+    queryWords.forEach(word => {
+      if (contentWords.includes(word)) {
+        matches++;
+      }
+    });
+    
+    return matches / queryWords.length;
   }
 }
+
+export const ragSystem = new RAGSystem();
