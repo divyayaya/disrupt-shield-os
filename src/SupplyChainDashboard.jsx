@@ -403,14 +403,46 @@ const SupplyChainDashboard = () => {
 
   // Real-time subscriptions
   useEffect(() => {
+    const fetchUpdatedData = async () => {
+      try {
+        const [ordersData, notificationsData] = await Promise.all([
+          SupabaseService.getOrders(),
+          SupabaseService.supabase
+            .from("notifications")
+            .select("*, orders(order_number), customers(name)")
+            .order("created_at", { ascending: false })
+            .limit(10),
+        ]);
+
+        setOrders(ordersData || []);
+        setNotifications(notificationsData.data || []);
+
+        // Update dashboard metrics
+        const highRiskCount = ordersData?.filter((o) => o.risk_score >= 70).length || 0;
+        const avgRisk = ordersData?.length
+          ? ordersData.reduce((sum, o) => sum + (o.risk_score || 0), 0) / ordersData.length
+          : 0;
+        const pendingNotifications = notificationsData.data?.filter((n) => !n.sent_at).length || 0;
+
+        setDashboardData(prev => ({
+          ...prev,
+          highRiskOrders: highRiskCount,
+          pendingNotifications,
+          avgRiskScore: Math.round(avgRisk),
+        }));
+      } catch (error) {
+        console.error("Failed to fetch updated data:", error);
+      }
+    };
+
     const ordersSubscription = SupabaseService.supabase
       .channel("orders_changes")
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "orders" },
         () => {
-          // Trigger data refresh when orders change
-          window.location.reload();
+          // Refresh data without reloading the page
+          fetchUpdatedData();
         }
       )
       .subscribe();
@@ -421,8 +453,8 @@ const SupplyChainDashboard = () => {
         "postgres_changes",
         { event: "*", schema: "public", table: "notifications" },
         () => {
-          // Trigger data refresh when notifications change
-          window.location.reload();
+          // Refresh data without reloading the page
+          fetchUpdatedData();
         }
       )
       .subscribe();
